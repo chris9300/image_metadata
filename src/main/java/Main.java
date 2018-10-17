@@ -8,6 +8,7 @@ public class Main {
 		System.out.println("----------- Apache Commons Imaging -------------");
 		imgLibExample.apacheCommonsImageExample();
 		
+		System.out.println("");
 		System.out.println("----------- Metadata Extractor -------------");
 		imgLibExample.metadataExtractorExample();
 	}

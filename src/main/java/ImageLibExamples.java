@@ -24,11 +24,20 @@ public class ImageLibExamples {
 		testFilePath.replace("/", File.separator);
 	}
 	
+	/**
+	 * Creates an output of the Metadata of an Example File.
+	 * Uses the Apache Commons Imaging library to extract the metadata
+	 */
 	public void apacheCommonsImageExample() {
 		File imgFile = new File(testFilePath);
 		apacheCommonsOutputMetadata(imgFile);
 	}
 
+	/**
+	 * Creates the output of the Metadata from the given image File imgFile Object
+	 * Uses the Apache Commons Imaging library to extract the metadata
+	 * @param imgFile
+	 */
 	public void apacheCommonsOutputMetadata(File imgFile) {
 		try {
 			
@@ -63,6 +72,11 @@ public class ImageLibExamples {
 	}
 	
 
+	/**
+	 * Prints a Metadata Tag and the associated value
+	 * @param jpegMetadata
+	 * @param tagInfo
+	 */
 	private static void printTagValue(final JpegImageMetadata jpegMetadata, final TagInfo tagInfo) {
 		final TiffField field = jpegMetadata.findEXIFValueWithExactMatch(tagInfo);
 		if (field == null) {
@@ -72,8 +86,23 @@ public class ImageLibExamples {
 		}
 	}
 	
+	
+	/**
+	 * Creates an output of the Metadata of an Example File.
+	 * Uses the Metadata Extractor library to extract the metadata
+	 */
 	public void metadataExtractorExample() {
 		File imgFile = new File(testFilePath);
+		metadataExtractorOutputMetadata(imgFile);
+	}
+	
+	/**
+	 * Creates the output of the Metadata from the given image File imgFile Object
+	 * Uses the Metadata Extractor library to extract the metadata
+	 * @param imgFile
+	 */
+	public void metadataExtractorOutputMetadata(File imgFile) {
+		
 		try {
 		Metadata metadata = ImageMetadataReader.readMetadata(imgFile);
 		
