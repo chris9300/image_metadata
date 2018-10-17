@@ -19,33 +19,38 @@ import com.drew.metadata.Tag;
 
 public class ImageLibExamples {
 	final String testFilePath = "src/main/resources/test_img1.jpg";
-
+	
+	public ImageLibExamples() {
+		testFilePath.replace("/", File.separator);
+	}
+	
 	public void apacheCommonsImageExample() {
+		File imgFile = new File(testFilePath);
+		apacheCommonsOutputMetadata(imgFile);
+	}
+
+	public void apacheCommonsOutputMetadata(File imgFile) {
 		try {
 			
-				testFilePath.replace("/", File.separator);
-				
-			// 
-			//File.separator
-
-			File imgFile = new File(testFilePath);
-			BufferedImage img = ImageIO.read(imgFile);
+			/*BufferedImage img = ImageIO.read(imgFile);
 			System.out.println("image file readed successfully");
 
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ImageIO.write(img, "jpg", baos);
 			byte[] imageBytes = baos.toByteArray();
-
+			*/
+			
 			ImageMetadata metadata = Imaging.getMetadata(imgFile);
 
 			if (metadata != null) {
-				if (metadata instanceof JpegImageMetadata) {
+				/*if (metadata instanceof JpegImageMetadata) {
 					JpegImageMetadata jpegMetadata = (JpegImageMetadata) metadata;
 					System.out.println("----------- JPEG Metadata -------");
 					printTagValue(jpegMetadata, TiffConstants.TIFF_TAG_DATE_TIME);
 					printTagValue(jpegMetadata, ExifTagConstants.EXIF_TAG_EXIF_IMAGE_WIDTH);
 					printTagValue(jpegMetadata, TiffConstants.EXIF_TAG_DATE_TIME_ORIGINAL);
 				}
+				*/
 
 				System.out.println("Meta:" + metadata);
 			} else {
