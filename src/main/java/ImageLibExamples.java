@@ -38,7 +38,7 @@ public class ImageLibExamples {
 	 * Uses the Apache Commons Imaging library to extract the metadata
 	 * @param imgFile
 	 */
-	public void apacheCommonsOutputMetadata(File imgFile) {
+	public static void apacheCommonsOutputMetadata(File imgFile) {
 		try {
 			
 			/*BufferedImage img = ImageIO.read(imgFile);
@@ -101,7 +101,7 @@ public class ImageLibExamples {
 	 * Uses the Metadata Extractor library to extract the metadata
 	 * @param imgFile
 	 */
-	public void metadataExtractorOutputMetadata(File imgFile) {
+	public static void metadataExtractorOutputMetadata(File imgFile) {
 		
 		try {
 		Metadata metadata = ImageMetadataReader.readMetadata(imgFile);
