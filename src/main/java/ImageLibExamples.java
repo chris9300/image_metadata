@@ -23,9 +23,7 @@ public class ImageLibExamples {
 	public void apacheCommonsImageExample() {
 		try {
 			
-			if (System.getProperty("os.name").startsWith("Windows")) {
-				testFilePath.replace("/", "\\");
-			}
+				testFilePath.replace("/", File.separator);
 				
 			// 
 			//File.separator
