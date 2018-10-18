@@ -18,9 +18,10 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
 public class ImageLibExamples {
-	final String testFilePath = "src/main/resources/test_img1.jpg";
+	String testFilePath = "src/main/resources/";
 	
-	public ImageLibExamples() {
+	public ImageLibExamples(String filename) {
+		testFilePath += filename;
 		testFilePath.replace("/", File.separator);
 	}
 	
