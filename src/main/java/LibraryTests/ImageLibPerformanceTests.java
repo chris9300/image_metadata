@@ -1,3 +1,4 @@
+package LibraryTests;
 import java.io.File;
 
 public class ImageLibPerformanceTests {
@@ -7,8 +8,8 @@ public class ImageLibPerformanceTests {
 	 */
 	final String FOLDER_PATH = "src/main/resources/AllTestImages";
 
-	static final int METADATA_EXTRACTOR_LIBRARY = 1;
-	static final int APACHE_COMMONS_IMAGING_LIBRARY = 2;
+	public static final int METADATA_EXTRACTOR_LIBRARY = 1;
+	public static final int APACHE_COMMONS_IMAGING_LIBRARY = 2;
 
 	public ImageLibPerformanceTests() {
 		FOLDER_PATH.replace("/", File.separator);

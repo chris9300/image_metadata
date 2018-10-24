@@ -1,3 +1,5 @@
+import LibraryTests.ImageLibExamples;
+import LibraryTests.ImageLibPerformanceTests;
 
 public class Main {
 
@@ -29,6 +31,9 @@ public class Main {
 			System.out.println("No paramters submitted. Use:");
 			System.out.println("example to get the metadata of an example file");
 			System.out.println("performTest to run a test to compare the performance of the Metadata Extractor and the Apache Commons Imaging Library");
+			
+			//System.out.println("---------- Default: Run Json Example -----------");
+			//ImageMetadataParser.writeExampleJson();
 		}
 	}
 
