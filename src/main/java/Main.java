@@ -32,8 +32,8 @@ public class Main {
 			System.out.println("example to get the metadata of an example file");
 			System.out.println("performTest to run a test to compare the performance of the Metadata Extractor and the Apache Commons Imaging Library");
 			
-			//System.out.println("---------- Default: Run Json Example -----------");
-			//ImageMetadataParser.writeExampleJson();
+			System.out.println("---------- Default: Run Json Example -----------");
+			ImageMetadataParser.writeExampleJson();
 		}
 	}
 
