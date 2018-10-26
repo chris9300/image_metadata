@@ -1,7 +1,10 @@
+package LibraryTests;
+
 import LibraryTests.ImageLibExamples;
 import LibraryTests.ImageLibPerformanceTests;
+import LibraryTests.ImageMetadataParser;
 
-public class Main {
+public class LibraryTestsMain {
 
 	static final int TEST_RUNS = 25;
 
