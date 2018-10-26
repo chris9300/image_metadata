@@ -6,7 +6,9 @@ import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 public class ImageMetadataController {
@@ -18,10 +20,10 @@ public class ImageMetadataController {
     }
 
     @PostMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/insert")
-    public void insert(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
+    public void insert(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
         ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
 
-        imageMetadataService.insertNewImageMetadata(orgData);
+        imageMetadataService.insertNewImageMetadata(orgData, imgFile);
         // todo process image
     }
 }
