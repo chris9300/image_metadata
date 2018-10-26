@@ -13,8 +13,8 @@ public class ImageMetadataEntity {
     @Column(name = "rspace_image_id")
     private Long rspaceImageId;
 
-    @Column(name = "image_version_id")
-    private Integer imageVersionId;
+    @Column(name = "image_version")
+    private Integer imageVersion;
 
     @Column(name = "customer_id")
     private String customerId;
@@ -25,10 +25,19 @@ public class ImageMetadataEntity {
     public ImageMetadataEntity() {
     }
 
-    public ImageMetadataEntity(Long rspaceImageId, String customerId) {
+    public ImageMetadataEntity(String customerId, Long rspaceImageId, Integer imageVersionId) {
         this.rspaceImageId = rspaceImageId;
+        this.imageVersion = imageVersionId;
         this.customerId = customerId;
     }
+
+    public ImageMetadataEntity(String customerId, Long rspaceImageId, Integer imageVersionId, String jsonMetadata) {
+        this.rspaceImageId = rspaceImageId;
+        this.imageVersion = imageVersionId;
+        this.customerId = customerId;
+        this.jsonMetadata = jsonMetadata;
+    }
+
 
     public Integer getImageId() {
         return imageId;
@@ -46,12 +55,12 @@ public class ImageMetadataEntity {
         this.rspaceImageId = rspaceImageId;
     }
 
-    public Integer getImageVersionId() {
-        return imageVersionId;
+    public Integer getImageVersion() {
+        return imageVersion;
     }
 
-    public void setImageVersionId(Integer imageVersionId) {
-        this.imageVersionId = imageVersionId;
+    public void setImageVersion(Integer imageVersion) {
+        this.imageVersion = imageVersion;
     }
 
     public String getCustomerId() {
