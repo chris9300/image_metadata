@@ -1,4 +1,4 @@
-package com.rspace.rspaceimgmetadata.microservice.repository;
+package com.rspace.rspaceimgmetadata.microservice.service;
 
 import javax.persistence.*;
 
