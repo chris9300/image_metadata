@@ -19,6 +19,9 @@ public class ImageMetadataEntity {
     @Column(name = "customer_id")
     private String customerId;
 
+    @Column(columnDefinition = "JSON", name = "metadata")
+    private String jsonMetadata;
+
     public ImageMetadataEntity() {
     }
 
@@ -57,5 +60,13 @@ public class ImageMetadataEntity {
 
     public void setCustomerId(String customerId) {
         this.customerId = customerId;
+    }
+
+    public String getJsonMetadata() {
+        return jsonMetadata;
+    }
+
+    public void setJsonMetadata(String jsonMetadata) {
+        this.jsonMetadata = jsonMetadata;
     }
 }
