@@ -47,7 +47,7 @@ public class ImageMetadataService {
 
 
         // The metadataList cannot directly be parsed into json.
-        // That's why the tags are stored as key/value pairs in a hashmap. This hashmap can be parsed by jackson
+        // That's why the tags are stored as key/value pairs in a hash map. This hash map can be parsed by jackson
         HashMap<String, String> metadataMap = new HashMap<>();
         for (int i = 0; i < metadataList.size(); i++) {
             ImageMetadataItem item = metadataList.get(i);
@@ -57,6 +57,7 @@ public class ImageMetadataService {
             metadataMap.put(pair[0], pair[1]);
         }
 
+        // convert hash map to json
         ObjectMapper objectMapper = new ObjectMapper();
         StringWriter stringWriter = new StringWriter();
 
