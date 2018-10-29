@@ -1,9 +1,5 @@
 package LibraryTests;
 
-import LibraryTests.ImageLibExamples;
-import LibraryTests.ImageLibPerformanceTests;
-import LibraryTests.ImageMetadataParser;
-
 public class LibraryTestsMain {
 
 	static final int TEST_RUNS = 25;
@@ -36,7 +32,7 @@ public class LibraryTestsMain {
 			System.out.println("performTest to run a test to compare the performance of the Metadata Extractor and the Apache Commons Imaging Library");
 			
 			System.out.println("---------- Default: Run Json Example -----------");
-			ImageMetadataParser.writeExampleJson();
+			JsonExample.writeExampleJson();
 		}
 	}
 

@@ -79,3 +79,4 @@ public class ImageMetadataEntity {
         this.jsonMetadata = jsonMetadata;
     }
 }
+
