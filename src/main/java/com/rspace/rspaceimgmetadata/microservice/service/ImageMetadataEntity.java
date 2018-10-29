@@ -5,19 +5,14 @@ import javax.persistence.*;
 @Entity
 @Table(name = "imageMetadata", catalog = "rspace_metadata")
 public class ImageMetadataEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    //@Id
+    //@GeneratedValue(strategy = GenerationType.IDENTITY)
+    //@Column(name = "db_id", columnDefinition = "integer not null auto_increment")
     @Column(name = "id")
     private Integer imageId;
 
-    @Column(name = "rspace_image_id")
-    private Long rspaceImageId;
-
-    @Column(name = "image_version")
-    private Integer imageVersion;
-
-    @Column(name = "customer_id")
-    private String customerId;
+    @EmbeddedId
+    private ImageMetadataEmbeddedKey custRspaceImageVersion;
 
     @Column(columnDefinition = "JSON", name = "metadata")
     private String jsonMetadata;
@@ -26,15 +21,11 @@ public class ImageMetadataEntity {
     }
 
     public ImageMetadataEntity(String customerId, Long rspaceImageId, Integer imageVersionId) {
-        this.rspaceImageId = rspaceImageId;
-        this.imageVersion = imageVersionId;
-        this.customerId = customerId;
+        this.custRspaceImageVersion = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, imageVersionId);
     }
 
     public ImageMetadataEntity(String customerId, Long rspaceImageId, Integer imageVersionId, String jsonMetadata) {
-        this.rspaceImageId = rspaceImageId;
-        this.imageVersion = imageVersionId;
-        this.customerId = customerId;
+        this.custRspaceImageVersion = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, imageVersionId);
         this.jsonMetadata = jsonMetadata;
     }
 
@@ -48,27 +39,35 @@ public class ImageMetadataEntity {
     }
 
     public Long getRspaceImageId() {
-        return rspaceImageId;
+        return custRspaceImageVersion.getRspaceImageId();
     }
 
     public void setRspaceImageId(Long rspaceImageId) {
-        this.rspaceImageId = rspaceImageId;
+        this.custRspaceImageVersion.setRspaceImageId(rspaceImageId);
     }
 
     public Integer getImageVersion() {
-        return imageVersion;
+        return custRspaceImageVersion.getImageVersion();
     }
 
     public void setImageVersion(Integer imageVersion) {
-        this.imageVersion = imageVersion;
+        this.custRspaceImageVersion.setImageVersion(imageVersion);
     }
 
     public String getCustomerId() {
-        return customerId;
+        return custRspaceImageVersion.getCustomerId();
     }
 
     public void setCustomerId(String customerId) {
-        this.customerId = customerId;
+        this.custRspaceImageVersion.setCustomerId(customerId);
+    }
+
+    public ImageMetadataEmbeddedKey getCustRspaceImageVersion() {
+        return custRspaceImageVersion;
+    }
+
+    public void setCustRspaceImageVersion(ImageMetadataEmbeddedKey custRspaceImageVersion) {
+        this.custRspaceImageVersion = custRspaceImageVersion;
     }
 
     public String getJsonMetadata() {
