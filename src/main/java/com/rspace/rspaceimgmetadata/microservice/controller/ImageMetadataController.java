@@ -26,7 +26,7 @@ public class ImageMetadataController {
      * @param version
      * @param imgFile
      */
-    @PostMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/insert")
+    @PutMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/insert")
     public void insert(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
         ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
 

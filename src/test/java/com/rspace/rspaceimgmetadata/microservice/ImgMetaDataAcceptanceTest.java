@@ -39,7 +39,7 @@ public class ImgMetaDataAcceptanceTest {
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		HttpEntity<LinkedMultiValueMap<String, Object>> entity = new HttpEntity<LinkedMultiValueMap<String, Object>>(parameters, headers);
 
-		ResponseEntity<String> response = restTemplate.exchange("/img_metadata/cust847/10043/2/insert", HttpMethod.POST, entity, String.class, "");
+		ResponseEntity<String> response = restTemplate.exchange("/img_metadata/cust847/10043/2/insert", HttpMethod.PUT, entity, String.class, "");
 
 
 		// Expect HTTP Ok
