@@ -3,7 +3,7 @@ package com.rspace.rspaceimgmetadata.microservice.service;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "imageMetadata", catalog = "rspace_metadata")
+@Table(name = "imageMetadata")
 public class ImageMetadataEntity {
     //@Id
     //@GeneratedValue(strategy = GenerationType.IDENTITY)

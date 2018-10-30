@@ -26,7 +26,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-imaging</artifactId>
-            <version>1.0-r1653468</version>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>

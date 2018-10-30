@@ -32,7 +32,7 @@ public class LibraryTestsMain {
 			System.out.println("performTest to run a test to compare the performance of the Metadata Extractor and the Apache Commons Imaging Library");
 			
 			System.out.println("---------- Default: Run Json Example -----------");
-			JsonExample.writeExampleJson();
+			//JsonExample.writeExampleJson();
 		}
 	}
 
