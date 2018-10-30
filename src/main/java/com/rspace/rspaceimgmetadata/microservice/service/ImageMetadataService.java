@@ -16,7 +16,24 @@ public class ImageMetadataService {
     @Autowired
     ImageMetadataRepository metadataRepository;
 
+    /**
+     * Insert the metadata of the imgFile to the database
+     * @param imageMetadataDO
+     * @param imgFile
+     */
     public void insertNewImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile) {
+        updateImageMetadata(imageMetadataDO,imgFile);
+    }
+
+
+    /**
+     * Updates the metadata of the imgFile in the database.
+     * The images is identified by the customerID, rspaceImageID and the image Version.
+     * If the database does not contain metadata with that key, a new row will be generated.
+     * @param imageMetadataDO
+     * @param imgFile
+     */
+    public void updateImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile){
         try {
             ImageMetadata metadata = Imaging.getMetadata(imgFile.getInputStream(), imgFile.getName());
             String jsonMetadata = ImageMetadataParser.parseToJson(metadata);
