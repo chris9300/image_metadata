@@ -47,6 +47,20 @@ public class ImageMetadataController {
 
         imageMetadataService.updateImageMetadata(orgData, imgFile);
     }
+
+
+    /**
+     * Returns the json metadata that are associated to the image of the key parameters
+     * The return value is a json string.
+     * @param customerId
+     * @param rspaceImageId
+     * @param version
+     * @return Json String
+     */
+    @GetMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/get")
+    public String get(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
+        return imageMetadataService.getImageMetadata(customerId, rspaceImageId, version);
+    }
     
     /**
      * A quick method to assert service is up and running

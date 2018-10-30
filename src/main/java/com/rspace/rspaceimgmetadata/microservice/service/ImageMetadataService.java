@@ -16,6 +16,14 @@ public class ImageMetadataService {
     @Autowired
     ImageMetadataRepository metadataRepository;
 
+
+    public String getImageMetadata(String custId, long rspaceImageId, int version){
+        ImageMetadataEmbeddedKey key = new ImageMetadataEmbeddedKey(custId, rspaceImageId, version);
+
+        // todo handle if empty
+        return metadataRepository.findById(key).get().getJsonMetadata();
+    }
+
     /**
      * Insert the metadata of the imgFile to the database
      * @param imageMetadataDO
@@ -39,8 +47,6 @@ public class ImageMetadataService {
             String jsonMetadata = ImageMetadataParser.parseToJson(metadata);
 
             imageMetadataDO.setJsonMetadata(jsonMetadata);
-
-            System.out.println(jsonMetadata);
 
         } catch (IOException ioex) {
             // todo Exception handling
