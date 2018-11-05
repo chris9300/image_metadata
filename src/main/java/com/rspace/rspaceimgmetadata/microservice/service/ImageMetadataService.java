@@ -1,5 +1,7 @@
 package com.rspace.rspaceimgmetadata.microservice.service;
 
+import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
+import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
 import com.rspace.rspaceimgmetadata.microservice.repository.ImageMetadataRepository;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
