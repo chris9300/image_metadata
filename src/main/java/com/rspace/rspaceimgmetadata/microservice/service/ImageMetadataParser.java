@@ -41,7 +41,9 @@ public class ImageMetadataParser {
         for (int i = 0; i < metadataList.size(); i++) {
             ImageMetadata.ImageMetadataItem item = metadataList.get(i);
 
-            String[] pair = item.toString().split(":", 2);
+            // Remove ' because the should not be in the json values
+            // Split the key/val pair at the first ": "
+            String[] pair = item.toString().replace("'","").split(": ", 2);
 
             String key = pair[0];
             String nextVal = pair[1];
