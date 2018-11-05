@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataEntity;
+import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService;
 
 @RestController

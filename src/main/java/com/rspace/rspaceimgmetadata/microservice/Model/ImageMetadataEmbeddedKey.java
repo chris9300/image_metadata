@@ -1,4 +1,4 @@
-package com.rspace.rspaceimgmetadata.microservice.service;
+package com.rspace.rspaceimgmetadata.microservice.Model;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
