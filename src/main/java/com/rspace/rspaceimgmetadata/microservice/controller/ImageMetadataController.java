@@ -1,5 +1,7 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
+import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataSearchResultEntity;
+import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ public class ImageMetadataController {
     @Autowired
     private ImageMetadataService imageMetadataService;
 
+    @Autowired
+    private ImageMetadataSearchService searchService;
     public ImageMetadataController() {
     }
 
@@ -60,6 +64,13 @@ public class ImageMetadataController {
     @GetMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/get")
     public String get(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
         return imageMetadataService.getImageMetadata(customerId, rspaceImageId, version);
+    }
+
+    
+    //public String search(@PathVariable String searchTerm, @RequestParam("json") String targetKeys ){
+    @GetMapping("/img_metadata/search/{searchTerm}")
+    public String search(@PathVariable String searchTerm){
+        return searchService.searchPrefixOverAllKeys(searchTerm);
     }
     
     /**
