@@ -1,6 +1,5 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
-import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataSearchResultEntity;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -66,11 +65,22 @@ public class ImageMetadataController {
         return imageMetadataService.getImageMetadata(customerId, rspaceImageId, version);
     }
 
-    
+
     //public String search(@PathVariable String searchTerm, @RequestParam("json") String targetKeys ){
     @GetMapping("/img_metadata/search/{searchTerm}")
     public String search(@PathVariable String searchTerm){
         return searchService.searchPrefixOverAllKeys(searchTerm);
+    }
+
+    /**
+     * Searches for Images that contains the searchTerm as prefix in metadata with keys which are given as a json array.
+     * @param searchTerm String prefix search Term
+     * @param targetKeys Json (string) array in the post-body
+     * @return
+     */
+    @PostMapping("/img_metadata/search/prefix/in/{searchTerm}")
+    public String searchPrefixIn(@PathVariable String searchTerm, @RequestBody String targetKeys){
+        return searchService.searchPrefixInKeys(searchTerm, targetKeys);
     }
     
     /**
