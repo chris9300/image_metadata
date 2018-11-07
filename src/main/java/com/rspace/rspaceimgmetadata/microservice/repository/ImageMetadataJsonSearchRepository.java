@@ -8,15 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMetadataEntity, ImageMetadataEmbeddedKey> {
 
-
-    @Query(value = "SELECT * FROM image_metadata i WHERE JSON_CONTAINS(i.metadata, :#{#make21}, '$.\"Make\"') = 1", nativeQuery = true)
-    //@Query(value = "SELECT * FROM image_metadata i WHERE JSON_EXTRACT(i.metadata, '$.\"Make\"') = ?1", nativeQuery = true)
-    ImageMetadataEntity searchForMake(@Param("make21") String make21);
-
-    @Query(value = "SELECT JSON_SEARCH(i.metadata, 'one', ?1) FROM image_metadata i", nativeQuery = true)
-    String searchOverAll(String searchTerm);
-
-    @Query(value =
+    String queryPartSelect =
             "SELECT " +
             "  CAST(" +          // The cast is necessary because otherwise java cannot interprete the json result as string
             "    json_object(" +
@@ -24,6 +16,7 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
             "      'customer_id', i.customer_id," +
             "      'rspace_image_id', rspace_image_id, " +
             "      'image_version', image_version, " +
+            "      'user_id', i.user_id," +
             "      'metadata', " +
             "       json_arrayagg(" +
             "         json_object(" +
@@ -33,29 +26,60 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
             "      ) " +
             "    )" +
             "    as char" +
-            "  ) as matches " +
+            "  ) as matches ";
+
+    String queryPartFrom =
             "FROM   " +
             "  image_metadata i," +
             "    JSON_TABLE(" +
-            "    JSON_SEARCH(i.metadata,'all',?1)," +
+            "    JSON_SEARCH(i.metadata,'all', :term)," +
             "    \"$[*]\"" +
             "        COLUMNS(key_path char(50) PATH '$')" +
-            "  ) as search " +
-            "where" +
-            "  JSON_SEARCH(i.metadata,'all',?1) IS NOT NULL" +
-            "    AND search.key_path IN (" +
-            "    SELECT" +
-            "      tar.target_keys" +
-            "        FROM" +
-            "      JSON_TABLE(" +
-            "        ?2," +
-            "        \"$[*]\"" +
-            "        COLUMNS(target_keys char(50) PATH '$')" +
-            "      ) as tar" +
-            "    )" +
-            "  GROUP BY i.customer_id, rspace_image_id, image_version", nativeQuery = true)
-    String[] searchOverTargetKeys(String searchTerm, String jsonTarKeyArr);
+            "  ) as search ";
 
-    // Evtl fkt für prefixTerm, subTerm
+    String queryPartWhereNotNull =
+            "where" +
+            "  JSON_SEARCH(i.metadata,'all', :term) IS NOT NULL ";
+
+    String queryPartWhereSelectedKeys =
+            "AND search.key_path IN (" +
+            "  SELECT" +
+            "    tar.target_keys" +
+            "  FROM" +
+            "    JSON_TABLE(" +
+            "      :jsonKeys," +
+            "      \"$[*]\"" +
+            "      COLUMNS(target_keys char(50) PATH '$')" +
+            "    ) as tar" +
+            "  )";
+
+    String queryPartWhereSelectedUsers =
+            "AND i.user_id IN ( " +
+            "  SELECT" +
+            "    u.uid" +
+            "  FROM" +
+            "    JSON_TABLE(" +
+            "      :jsonUsers," +
+			"	   \"$[*]\"" +
+            "      COLUMNS(uid char(50) PATH '$')" +
+            "    ) as u" +
+		    "  )";
+
+    String queryPartGroupBy = "GROUP BY i.customer_id, rspace_image_id, image_version";
+
+    //String searchInAll(String searchTerm);
+
+    //String searchInAllKeysForUsers(String searchTerm, String jsonUsers);
+
+    //@Query(value = queryPartSelect + queryPartFrom + queryPartWhereNotNull + queryPartWhereSelectedKeys + queryPartWhereSelectedUsers + queryPartGroupBy, nativeQuery = true)
+    //String searchInKeysForUsers(@Param("term") String searchTerm, @Param("jsonKeys")String jsonTarKeyArr, @Param("jsonUsers") String jsonUsers);
+
+
+
+    @Query(value = "SELECT JSON_SEARCH(i.metadata, 'one', ?1) FROM image_metadata i", nativeQuery = true)
+    String searchInAllKeys(String searchTerm);
+
+    @Query(value = queryPartSelect + queryPartFrom + queryPartWhereNotNull + queryPartWhereSelectedKeys + queryPartGroupBy, nativeQuery = true)
+    String[] searchInKeysForAllUsers(@Param("term") String searchTerm, @Param("jsonKeys")String jsonTarKeyArr);
 
 }

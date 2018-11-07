@@ -29,10 +29,10 @@ public class ImageMetadataController {
      * @param version
      * @param imgFile
      */
-    @PutMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/insert")
-    public void insert(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
+    @PutMapping("/img_metadata/{customerId}/{userId}/{rspaceImageId}/{version}/insert")
+    public void insert(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
         ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
-
+        orgData.setUserId(userId);
         imageMetadataService.insertNewImageMetadata(orgData, imgFile);
     }
 
@@ -44,10 +44,10 @@ public class ImageMetadataController {
      * @param version
      * @param imgFile
      */
-    @PostMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/update")
-    public void update(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
+    @PostMapping("/img_metadata/{customerId}/{userId}/{rspaceImageId}/{version}/update")
+    public void update(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
         ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
-
+        orgData.setUserId(userId);
         imageMetadataService.updateImageMetadata(orgData, imgFile);
     }
 
@@ -69,7 +69,7 @@ public class ImageMetadataController {
     //public String search(@PathVariable String searchTerm, @RequestParam("json") String targetKeys ){
     @GetMapping("/img_metadata/search/{searchTerm}")
     public String search(@PathVariable String searchTerm){
-        return searchService.searchPrefixOverAllKeys(searchTerm);
+        return searchService.searchPrefixInAllKeys(searchTerm);
     }
 
     /**

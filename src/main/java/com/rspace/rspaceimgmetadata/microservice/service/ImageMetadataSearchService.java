@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.List;
 
 @Service
 public class ImageMetadataSearchService {
@@ -22,9 +21,9 @@ public class ImageMetadataSearchService {
      * Searches for images with the searches for images with
      * @return
      */
-    public String searchPrefixOverAllKeys(String searchPrefix){
+    public String searchPrefixInAllKeys(String searchPrefix){
         String searchTerm = searchPrefix + "%";
-        String[] searchResults = searchRepository.searchOverTargetKeys(searchTerm, "[\"$.Model\",\"$.YCbCrPositioning\", \"$.ColorSpace\"]");
+        String[] searchResults = searchRepository.searchInKeysForAllUsers(searchTerm, "[\"$.Model\",\"$.YCbCrPositioning\", \"$.ColorSpace\"]");
 
         System.out.println(searchResults[0]);
         return searchResults[0];
@@ -39,10 +38,12 @@ public class ImageMetadataSearchService {
     public String searchPrefixInKeys(String searchPrefix, String jsonTargtKeys){
         // todo: Function that adds the $. prefixes on the keys
         String searchTerm = searchPrefix + "%";
-        String[] searchResults = searchRepository.searchOverTargetKeys(searchTerm, jsonTargtKeys);
+        String[] searchResults = searchRepository.searchInKeysForAllUsers(searchTerm, jsonTargtKeys);
 
         return resultListToJsonArr(searchResults);
     }
+
+
 
 
     /**

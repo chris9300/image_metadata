@@ -14,6 +14,9 @@ public class ImageMetadataEntity {
     @EmbeddedId
     private ImageMetadataEmbeddedKey custRspaceImageVersion;
 
+    @Column(name = "user_id")
+    private String userId;
+
     @Column(columnDefinition = "JSON", name = "metadata")
     private String jsonMetadata;
 
@@ -68,6 +71,14 @@ public class ImageMetadataEntity {
 
     public void setCustRspaceImageVersion(ImageMetadataEmbeddedKey custRspaceImageVersion) {
         this.custRspaceImageVersion = custRspaceImageVersion;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public String getJsonMetadata() {
