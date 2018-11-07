@@ -1,8 +1,12 @@
 package com.rspace.rspaceimgmetadata.microservice;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.assertTrue;
 
-
+import javafx.application.Application;
+import org.hamcrest.CoreMatchers;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +49,30 @@ public class ImgMetaDataAcceptanceTest {
 		// Expect HTTP Ok
 		assertEquals(response.getStatusCode().toString(), HttpStatus.OK.toString());
 
+		//todo: Check if the data is really in the database
+
+	}
+
+	//todo: Only perliminary testcase!! (the correct data has to be in the database
+
+	/**
+	 * Sends a POST-Request with a search Term and a Keyset. Expected that the json search result is part of the answer.
+	 * Condition: The Test images have to be in the test Database (todo)
+	 */
+	@Test
+	public void searchPrefixInTest(){
+		// The Keyset for the search, which is send in the post request.
+		String jsonKeySet = "[\"$.Flash\", \"$.ColorSpace\"]";
+		String searchTerm = "1";
+		String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<String>(jsonKeySet, headers);
+
+		ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/in/" + searchTerm, HttpMethod.POST, entity, String.class, "");
+
+		assertThat( response.toString(), containsString(expectedJson));
 	}
 
 	/*
