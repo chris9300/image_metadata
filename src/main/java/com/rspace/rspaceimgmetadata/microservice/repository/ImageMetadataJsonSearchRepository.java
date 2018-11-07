@@ -16,37 +16,44 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
     @Query(value = "SELECT JSON_SEARCH(i.metadata, 'one', ?1) FROM image_metadata i", nativeQuery = true)
     String searchOverAll(String searchTerm);
 
-    @Query(value = "SELECT \n" +
-            "\ti.customer_id,\n" +
-            "    rspace_image_id, \n" +
-            "    image_version,\n" +
-            "    CAST("+
-            "    json_arrayagg(\n" +
-            "\t\tjson_object(\n" +
-            "\t\t\tsearch.key_path,          \n" +
-            "\t\t\tjson_extract(i.metadata, search.key_path)\n" +
-            "\t\t) \n" +
-            "\t) as char) as matches\n" +
-            "FROM   \n" +
-            "\timage_metadata i,\n" +
-            "    JSON_TABLE(\n" +
-            "    JSON_SEARCH(i.metadata,'all',?1),\n" +
-            "\t\t\"$[*]\"\n" +
-            "        COLUMNS(key_path char(50) PATH '$')\n" +
-            "\t) as search\n" +
-            "where\n" +
-            "\tJSON_SEARCH(i.metadata,'all',?1) IS NOT NULL\n" +
-            "    AND search.key_path IN (\n" +
-            "\t\tSELECT\n" +
-            "\t\t\ttar.target_keys\n" +
-            "        FROM\n" +
-            "\t\t\tJSON_TABLE(\n" +
-            "\t\t\t\t?2,\n" +
-            "\t\t\t\t\"$[*]\"\n" +
-            "\t\t\t\tCOLUMNS(target_keys char(50) PATH '$')\n" +
-            "\t\t\t) as tar\n" +
-            "\t\t)\n" +
-            "\tGROUP BY i.customer_id, rspace_image_id, image_version", nativeQuery = true)
+    @Query(value =
+            "SELECT " +
+            "  CAST(" +          // The cast is necessary because otherwise java cannot interprete the json result as string
+            "    json_object(" +
+            "      'id', i.id," +
+            "      'customer_id', i.customer_id," +
+            "      'rspace_image_id', rspace_image_id, " +
+            "      'image_version', image_version, " +
+            "      'metadata', " +
+            "       json_arrayagg(" +
+            "         json_object(" +
+            "           search.key_path, " +
+            "           json_extract(i.metadata, search.key_path)" +
+            "        ) " +
+            "      ) " +
+            "    )" +
+            "    as char" +
+            "  ) as matches " +
+            "FROM   " +
+            "  image_metadata i," +
+            "    JSON_TABLE(" +
+            "    JSON_SEARCH(i.metadata,'all',?1)," +
+            "    \"$[*]\"" +
+            "        COLUMNS(key_path char(50) PATH '$')" +
+            "  ) as search " +
+            "where" +
+            "  JSON_SEARCH(i.metadata,'all',?1) IS NOT NULL" +
+            "    AND search.key_path IN (" +
+            "    SELECT" +
+            "      tar.target_keys" +
+            "        FROM" +
+            "      JSON_TABLE(" +
+            "        ?2," +
+            "        \"$[*]\"" +
+            "        COLUMNS(target_keys char(50) PATH '$')" +
+            "      ) as tar" +
+            "    )" +
+            "  GROUP BY i.customer_id, rspace_image_id, image_version", nativeQuery = true)
     String[] searchOverTargetKeys(String searchTerm, String jsonTarKeyArr);
 
     // Evtl fkt für prefixTerm, subTerm
