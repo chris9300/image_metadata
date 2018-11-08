@@ -68,19 +68,41 @@ public class ImageMetadataController {
 
     //public String search(@PathVariable String searchTerm, @RequestParam("json") String targetKeys ){
     @GetMapping("/img_metadata/search/{searchTerm}")
-    public String search(@PathVariable String searchTerm){
-        return searchService.searchPrefixInAllKeys(searchTerm);
+    public String searchPrefixInAll(@PathVariable String searchTerm){
+        return searchService.searchPrefixInAll(searchTerm);
+    }
+
+
+    /**
+     * Searches for Images that contains the searchTerm as prefix in metadata with keys which are given as a json array.
+     * @param searchTerm URL Path Arg: String prefix search Term
+     * @param jsonKeys Json (string) array in the post-body
+     * @return
+     */
+    @PostMapping("/img_metadata/search/prefix/inKeys/{searchTerm}")
+    public String searchPrefixInKeysOfAllUsers(@PathVariable String searchTerm, @RequestBody String jsonKeys){
+        return searchService.searchPrefixInKeysOfAllUsers(searchTerm, jsonKeys);
     }
 
     /**
      * Searches for Images that contains the searchTerm as prefix in metadata with keys which are given as a json array.
+     * The resulted images are only from users of the json user array
+     *
+     * Json Body Structure:
+     * {"keys": [], "users": []}
+     *
      * @param searchTerm String prefix search Term
-     * @param targetKeys Json (string) array in the post-body
+     * @param jsonParameter Json (string) array in the post-body which contains the keys and users
      * @return
      */
-    @PostMapping("/img_metadata/search/prefix/in/{searchTerm}")
-    public String searchPrefixIn(@PathVariable String searchTerm, @RequestBody String targetKeys){
-        return searchService.searchPrefixInKeys(searchTerm, targetKeys);
+    @PostMapping("/img_metadata/search/prefix/inKeys/ofUsers/{searchTerm}")
+    public String searchPrefixInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
+        return searchService.searchPrefixInKeysOfUsers(searchTerm, jsonParameter);
+    }
+
+    @PostMapping("/img_metadata/search/prefix/ofUsers/{searchTerm}")
+    public String searchPrefixInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
+        return searchService.searchPrefixInAllKeysOfUsers(searchTerm, jsonUsers);
     }
     
     /**
