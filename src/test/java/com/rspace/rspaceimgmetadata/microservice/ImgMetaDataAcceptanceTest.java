@@ -1,5 +1,7 @@
 package com.rspace.rspaceimgmetadata.microservice;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -16,6 +18,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.LinkedMultiValueMap;
+
+import java.security.PublicKey;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
@@ -43,7 +47,7 @@ public class ImgMetaDataAcceptanceTest {
 		headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 		HttpEntity<LinkedMultiValueMap<String, Object>> entity = new HttpEntity<LinkedMultiValueMap<String, Object>>(parameters, headers);
 
-		ResponseEntity<String> response = restTemplate.exchange("/img_metadata/cust847/uid_test/10043/2/insert", HttpMethod.PUT, entity, String.class, "");
+		ResponseEntity<String> response = restTemplate.exchange("/img_metadata/custTest847/uid_test/10043/2/insert", HttpMethod.PUT, entity, String.class, "");
 
 
 		// Expect HTTP Ok
@@ -60,9 +64,9 @@ public class ImgMetaDataAcceptanceTest {
 	 * Condition: The Test images have to be in the test Database (todo)
 	 */
 	@Test
-	public void searchPrefixInTest(){
+	public void searchPrefixInKeysTest(){
 		// The Keyset for the search, which is send in the post request.
-		String jsonKeySet = "[\"$.Flash\", \"$.ColorSpace\"]";
+		String jsonKeySet = "[\"Flash\", \"ColorSpace\"]";
 		String searchTerm = "1";
 		String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
 
@@ -70,13 +74,49 @@ public class ImgMetaDataAcceptanceTest {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		HttpEntity<String> entity = new HttpEntity<String>(jsonKeySet, headers);
 
-		ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/in/" + searchTerm, HttpMethod.POST, entity, String.class, "");
+		ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/" + searchTerm, HttpMethod.POST, entity, String.class, "");
+		String body = response.getBody();
 
 		//todo: problems with the escape chars
 		//assertThat( response.toString(), containsString(expectedJson));
-		assertThat( response.toString(), containsString("cust847"));
-		assertThat( response.toString(), containsString("10043"));
-		assertThat( response.toString(), containsString("2"));
+		assertThat( body, containsString("cust847"));
+		assertThat( body, containsString("10043"));
+		assertThat( body, containsString("2"));
+	}
+
+	/**
+	 *
+	 */
+	@Test
+	public void searchPrefixTest(){
+		//Searches a term that should return nothing
+		String emptyBody = this.restTemplate.getForObject("/img_metadata/search/xyz", String.class);
+		assertThat(emptyBody, is("[]"));
+
+		//Searches a term that should return results
+		String body = this.restTemplate.getForObject("/img_metadata/search/EVA", String.class);
+		assertThat(body, containsString("EVA-L09"));
+		assertThat(body, containsString("custTest847"));
+
+		//todo: Answers that should ne returned
+	}
+
+
+	@Test
+	public void searchPrefixInKeysOfUsersTest(){
+		String jsonParameters = "{\"keys\":[\"Model\"], \"users\":[\"uid_test\"]}";
+		String searchTerm = "EVA";
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		HttpEntity<String> entity = new HttpEntity<String>(jsonParameters, headers);
+
+		ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTerm, HttpMethod.POST, entity, String.class, "");
+		String body = response.getBody();
+
+		assertThat(body, containsString("EVA-L09"));
+		assertThat(body, containsString("uid_test"));
+		assertThat(body, not("uid1"));
 	}
 
 	/*
