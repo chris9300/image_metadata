@@ -23,10 +23,27 @@ public class ImgMetaDataSearchTest {
     private TestRestTemplate restTemplate;
 
     /**
+     *
+     */
+    @Test
+    public void searchPrefixTest(){
+        //Searches a term that should return nothing
+        String emptyBody = this.restTemplate.getForObject("/img_metadata/search/xyz", String.class);
+        assertThat(emptyBody, is("[]"));
+
+        //Searches a term that should return results but NOT an image with the id 566
+        String body = this.restTemplate.getForObject("/img_metadata/search/EVA", String.class);
+        assertThat(body, containsString("EVA-L09"));
+        assertThat(body, containsString("custTest847"));
+
+        assertThat(body, not(containsString("566")));
+    }
+
+    /**
      * Sends a POST-Request with a search Term and a Keyset. Expected that the json search result is part of the answer.
      */
     @Test
-    public void searchPrefixInKeysTest(){
+    public void searchPrefixInKeysOfAllUsersTest(){
         // The Keyset for the search, which is send in the post request.
         String jsonKeySet = "[\"City\"]";
         String searchTerm = "City";
@@ -48,22 +65,9 @@ public class ImgMetaDataSearchTest {
         assertThat(body,not(containsString("custTest847")));
     }
 
-    /**
-     *
-     */
-    @Test
-    public void searchPrefixTest(){
-        //Searches a term that should return nothing
-        String emptyBody = this.restTemplate.getForObject("/img_metadata/search/xyz", String.class);
-        assertThat(emptyBody, is("[]"));
 
-        //Searches a term that should return results
-        String body = this.restTemplate.getForObject("/img_metadata/search/EVA", String.class);
-        assertThat(body, containsString("EVA-L09"));
-        assertThat(body, containsString("custTest847"));
-
-        //todo: Answers that should ne returned
-    }
+    //todo tbd
+    public void searchPrefixInAllKeysOfUsersTest(){}
 
 
     /**
@@ -71,18 +75,57 @@ public class ImgMetaDataSearchTest {
      */
     @Test
     public void searchPrefixInKeysOfUsersTest(){
-        String jsonParameters = "{\"keys\":[\"Model\"], \"users\":[\"uid_test\"]}";
-        String searchTerm = "EVA";
+        String jsonParametersPOS = "{\"keys\":[\"Model\"], \"users\":[\"uid_test\"]}";
+        String searchTermPOS = "EVA";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonParameters, headers);
+        HttpEntity<String> entity = new HttpEntity<String>(jsonParametersPOS, headers);
 
-        ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTerm, HttpMethod.POST, entity, String.class, "");
-        String body = response.getBody();
+        ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermPOS, HttpMethod.POST, entity, String.class, "");
+        String bodyPOS = response.getBody();
 
-        assertThat(body, containsString("EVA-L09"));
-        assertThat(body, containsString("uid_test"));
-        assertThat(body, not("uid1"));
+        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, containsString("EVA-L09"));
+        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, containsString("uid_test"));
+        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, not(containsString("uid1")));
+
+        /// Check if images get returned if an empty (not existing) user is set
+        String jsonParametersNEG = "{\"keys\":[\"Model\"], \"users\":[\"uid_empty\"]}";
+        String searchTermNEG = "EVA";
+
+        headers = new HttpHeaders();
+        entity = new HttpEntity<String>(jsonParametersNEG, headers);
+
+        response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermNEG, HttpMethod.POST, entity, String.class, "");
+        String bodyNEG = response.getBody();
+
+        assertThat("Tried not existing user",bodyNEG, is("[]"));
+
+
+        /// Check if images get returned if an empty (not existing) searchTerm is set
+
+        jsonParametersNEG = "{\"keys\":[\"Model\"], \"users\":[\"uid_test\"]}";
+        searchTermNEG = "xyz";
+
+        headers = new HttpHeaders();
+        entity = new HttpEntity<String>(jsonParametersNEG, headers);
+
+        response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermNEG, HttpMethod.POST, entity, String.class, "");
+        bodyNEG = response.getBody();
+
+        assertThat("Tried not existing searchTerm", bodyNEG, is("[]"));
+
+        /// Check if images get returned if an empty (not existing) key is set
+
+        jsonParametersNEG = "{\"keys\":[\"Empty\"], \"users\":[\"uid_test\"]}";
+        searchTermNEG = "EVA";
+
+        headers = new HttpHeaders();
+        entity = new HttpEntity<String>(jsonParametersNEG, headers);
+
+        response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermNEG, HttpMethod.POST, entity, String.class, "");
+        bodyNEG = response.getBody();
+
+        assertThat("Tried not existing key", bodyNEG, is("[]"));
     }
 }
