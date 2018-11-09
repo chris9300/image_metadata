@@ -66,7 +66,7 @@ public class ImageMetadataController {
     }
 
 
-    //public String search(@PathVariable String searchTerm, @RequestParam("json") String targetKeys ){
+
     @GetMapping("/img_metadata/search/{searchTerm}")
     public String searchPrefixInAll(@PathVariable String searchTerm){
         return searchService.searchPrefixInAll(searchTerm);
@@ -85,6 +85,19 @@ public class ImageMetadataController {
     }
 
     /**
+     * Searches for Images that contains the searchTerm as prefix in metadata of images that are from a user of the json users arr.
+     * The resulted images are only from users of the json user array
+     *
+     * @param searchTerm
+     * @param jsonUsers json array with user ids
+     * @return
+     */
+    @PostMapping("/img_metadata/search/prefix/ofUsers/{searchTerm}")
+    public String searchPrefixInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
+        return searchService.searchPrefixInAllKeysOfUsers(searchTerm, jsonUsers);
+    }
+
+    /**
      * Searches for Images that contains the searchTerm as prefix in metadata with keys which are given as a json array.
      * The resulted images are only from users of the json user array
      *
@@ -100,10 +113,6 @@ public class ImageMetadataController {
         return searchService.searchPrefixInKeysOfUsers(searchTerm, jsonParameter);
     }
 
-    @PostMapping("/img_metadata/search/prefix/ofUsers/{searchTerm}")
-    public String searchPrefixInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
-        return searchService.searchPrefixInAllKeysOfUsers(searchTerm, jsonUsers);
-    }
     
     /**
      * A quick method to assert service is up and running
