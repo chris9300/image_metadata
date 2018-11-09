@@ -35,7 +35,12 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
             "FROM   " +
             "  image_metadata i," +
             "    JSON_TABLE(" +
-            "    JSON_SEARCH(i.metadata,'all', :term)," +
+                    //JSON_MERGE is necessary because otherwise single results are not in an (1-element) array and
+                    // will not be considered from the json table operator
+            "      JSON_MERGE(" +
+            "        '[]', " +
+            "        JSON_SEARCH(i.metadata,'all', :term)" +
+            "        )," +
             "    \"$[*]\"" +
             "        COLUMNS(key_path char(50) PATH '$')" +
             "  ) as search ";
