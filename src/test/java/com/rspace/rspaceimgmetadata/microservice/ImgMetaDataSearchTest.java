@@ -71,6 +71,14 @@ public class ImgMetaDataSearchTest {
 
 
     /**
+     * Checks if a search returns an image that is from the user and contains the searchTerm
+     *
+     * Check also if:
+     * A image from the same user that does not contain the search term will not returned
+     *
+     * AND
+     *
+     * A image from another user that does contain the search term will not returned
      *
      */
     @Test
@@ -88,6 +96,9 @@ public class ImgMetaDataSearchTest {
         assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, containsString("EVA-L09"));
         assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, containsString("uid_test"));
         assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, not(containsString("uid1")));
+        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, not(containsString("custTest3")));
+
+
 
         /// Check if images get returned if an empty (not existing) user is set
         String jsonParametersNEG = "{\"keys\":[\"Model\"], \"users\":[\"uid_empty\"]}";
