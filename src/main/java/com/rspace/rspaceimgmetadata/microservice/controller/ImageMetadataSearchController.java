@@ -54,7 +54,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/inKeys/ofUsers/{searchTerm}")
     public String searchInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
-        return searchService.searchPrefixInKeysOfUsers(searchTerm, jsonParameter);
+        return searchService.searchTermInKeysOfUsers(searchTerm, jsonParameter);
     }
 
     /// ------------------ Prefix Searches ------------------
