@@ -48,8 +48,6 @@ public class ImgMetaDataAcceptanceTest {
 
 	}
 
-	//todo: Only perliminary testcase!! (the correct data has to be in the database)
-
 
 
 	/*
