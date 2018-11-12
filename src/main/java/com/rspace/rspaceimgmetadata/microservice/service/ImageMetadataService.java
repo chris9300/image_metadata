@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Service
 public class ImageMetadataService {
@@ -19,11 +20,15 @@ public class ImageMetadataService {
     ImageMetadataRepository metadataRepository;
 
 
-    public String getImageMetadata(String custId, long rspaceImageId, int version){
+    public Optional<String> getImageMetadata(String custId, long rspaceImageId, int version){
         ImageMetadataEmbeddedKey key = new ImageMetadataEmbeddedKey(custId, rspaceImageId, version);
 
-        // todo handle if empty
-        return metadataRepository.findById(key).get().getJsonMetadata();
+        Optional<ImageMetadataEntity> dbResult = metadataRepository.findById(key);
+        Optional<String> jsonResult = Optional.empty();
+        if(dbResult.isPresent()){
+            jsonResult = Optional.of(dbResult.get().getJsonMetadata());
+        }
+        return jsonResult;
     }
 
     /**
@@ -31,7 +36,7 @@ public class ImageMetadataService {
      * @param imageMetadataDO
      * @param imgFile
      */
-    public void insertNewImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile) {
+    public void insertNewImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile)throws WrongFileFormatException {
         updateImageMetadata(imageMetadataDO,imgFile);
     }
 
@@ -43,7 +48,7 @@ public class ImageMetadataService {
      * @param imageMetadataDO
      * @param imgFile
      */
-    public void updateImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile){
+    public void updateImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile) throws WrongFileFormatException{
         try {
             ImageMetadata metadata = Imaging.getMetadata(imgFile.getInputStream(), imgFile.getName());
             String jsonMetadata = ImageMetadataParser.parseToJson(metadata);
@@ -51,14 +56,20 @@ public class ImageMetadataService {
             imageMetadataDO.setJsonMetadata(jsonMetadata);
 
         } catch (IOException ioex) {
-            // todo Exception handling
             ioex.printStackTrace();
         } catch (ImageReadException e) {
-            // todo EceptionHandling
             e.printStackTrace();
+            throw new WrongFileFormatException("");
         }
 
         metadataRepository.save(imageMetadataDO);
     }
+
+    public class WrongFileFormatException extends Exception {
+        public WrongFileFormatException(String message) {
+            super(message);
+        }
+    }
+
 
 }
