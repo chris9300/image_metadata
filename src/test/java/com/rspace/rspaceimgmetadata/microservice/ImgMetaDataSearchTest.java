@@ -23,6 +23,160 @@ public class ImgMetaDataSearchTest {
     private TestRestTemplate restTemplate;
 
     /**
+     * Positiv test:
+     * - Searches an (exact) existing Term
+     * Negative tests:
+     * - Searches existing prefix
+     * - Searches not existing term
+     */
+    @Test
+    public void searchTermTest(){
+        //Searches an existing Term
+        String searchTerm1 = "EVA_L09";
+        String testBody1 = this.restTemplate.getForObject("/img_metadata/search/" + searchTerm1, String.class);
+        assertThat(testBody1, containsString("EVA-L09"));
+        assertThat(testBody1, containsString("cust_test_1"));
+        assertThat(testBody1, containsString("cust_test_4"));
+
+        assertThat(testBody1, not(containsString("cust_test_2")));
+        assertThat(testBody1, not(containsString("cust_test_3")));
+
+        //Searches an existing prefix, should not return anything
+        String searchTerm2 = "EVA";
+        String testBody2 = this.restTemplate.getForObject("/img_metadata/search/" + searchTerm2, String.class);
+        assertThat(testBody2, is("[]"));
+
+        //Searches a term that should return nothing
+        String searchTerm3 = "xyz";
+        String emptyBody = this.restTemplate.getForObject("/img_metadata/search/" + searchTerm3, String.class);
+        assertThat(emptyBody, is("[]"));
+    }
+
+
+    /**
+     * Positiv test:
+     * - Search for a exact term of a particular key
+     *
+     * Negativ tests:
+     * - Search for a exact term wich is in another key
+     * - Search for a prefix of a term of the selected key
+     */
+    public void searchTermInKeysOfAllUsersTest(){
+        String testUrl = "/img_metadata/search/inKeys/";
+        String jsonKeySet = "[\"City\"]";
+        String searchTerm1 = "City (Core) (ref2017.1)";
+        //String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
+
+        String testBody1 = performSearchTestWithParameter(searchTerm1, jsonKeySet, testUrl);
+
+        //Should be the only answer image:
+        assertThat(testBody1, containsString("City (Core) (ref2017.1)"));
+        assertThat( testBody1, containsString("cust_test_2"));
+        assertThat( testBody1, containsString("cust_test_3"));
+
+        //Should not be in the answer images
+        assertThat(testBody1,not(containsString("cust_test_1")));
+        assertThat(testBody1,not(containsString("cust_test_4")));
+
+        // Negativ Test: Check that "EVA", which is in other images on other keys, should not return any images
+        String searchTerm2 = "EVA-L09";
+        String testBody2 = performSearchTestWithParameter(searchTerm2, jsonKeySet, testUrl);
+
+        assertThat(testBody2, is("[]"));
+
+        // Negativ Test: Check that "City", which is only a prefix, should not return any images
+        String searchTerm3 = "City";
+        String testBody3 = performSearchTestWithParameter(searchTerm3, jsonKeySet, testUrl);
+
+        assertThat(testBody3, is("[]"));
+    }
+
+    /**
+     * Positive test:
+     * - Searches for exact term of particular user
+     *
+     * Negative tests:
+     * - Searches for a term that only exists by other (not selected) users
+     * - Searches for a prefix, that contains the selected user
+     */
+    @Test
+    public void searchTermInAllKeysOfUsersTest(){
+        String testUrl = "/img_metadata/search/ofUsers/";
+        String jsonUserSet1 = "[\"uid_test_3\"]";
+        String searchTerm1 = "City (Core) (ref2017.1)";
+
+        String bodyTest1 = performSearchTestWithParameter(searchTerm1, jsonUserSet1, testUrl);
+
+        assertThat(bodyTest1, containsString("City"));
+        assertThat(bodyTest1, containsString("cust_test_3"));
+        assertThat(bodyTest1, not(containsString("cust_test_1")));
+        assertThat(bodyTest1, not(containsString("cust_test_2")));
+        assertThat(bodyTest1, not(containsString("cust_test_4")));
+
+        // Search term that only exists for other users
+        String jsonUserSet2 = "[\"uid_test_1\"]";
+        String searchTerm2 = "City (Core) (ref2017.1)";
+        String bodyTest2 = performSearchTestWithParameter(searchTerm2, jsonUserSet2, testUrl);
+
+        assertThat(bodyTest2, is("[]"));
+
+        // Search prefix that exists for selected user
+        String jsonUserSet3 = "[\"uid_test_3\"]";
+        String searchTerm3 = "City";
+        String bodyTest3 = performSearchTestWithParameter(searchTerm2, jsonUserSet2, testUrl);
+
+        assertThat(bodyTest2, is("[]"));
+    }
+
+    @Test
+    public void searchTermInKeysOfUsersTest(){
+        String testUrl = "/img_metadata/search/inKeys/ofUsers/";
+        String jsonParameter1 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_3\"]}";
+        String searchTerm1 = "EVA-L09";
+
+        String bodyTest1 = performSearchTestWithParameter(searchTerm1, jsonParameter1, testUrl);
+
+        assertThat( bodyTest1, containsString("EVA-L09"));
+        assertThat( bodyTest1, containsString("cust_test_4"));
+
+        assertThat( bodyTest1, not(containsString("cust_test_1")));
+        assertThat( bodyTest1, not(containsString("cust_test_2")));
+        assertThat( bodyTest1, not(containsString("cust_test_3")));
+
+
+        /// Check if images get returned if the search term exists for another user
+
+        String jsonParameter2 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_2\"]}";
+        String searchTerm2 = "EVA-L09";
+
+        String bodyTest2 = performSearchTestWithParameter(searchTerm2, jsonParameter2, testUrl);
+
+        assertThat( bodyTest2, is("[]"));
+
+        /// Check if images get returned if the search term exists for the selected user but not in the selected keys
+
+        String jsonParameter3 = "{\"keys\":[\"City\"], \"users\":[\"uid_test_3\"]}";
+        String searchTerm3 = "EVA-L09";
+
+        String bodyTest3 = performSearchTestWithParameter(searchTerm3, jsonParameter3, testUrl);
+
+        assertThat( bodyTest3, is("[]"));
+
+        // Check prefix
+        String jsonParameter4 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_3\"]}";
+        String searchTerm4 = "EVA";
+
+        String bodyTest4 = performSearchTestWithParameter(searchTerm4, jsonParameter4, testUrl);
+
+        assertThat(bodyTest4, is("[]"));
+    }
+
+
+
+
+    // ************** Prefix - Tests *********************
+
+    /**
      *
      */
     @Test
@@ -33,10 +187,12 @@ public class ImgMetaDataSearchTest {
 
         //Searches a term that should return results but NOT an image with the id 566
         String body = this.restTemplate.getForObject("/img_metadata/search/prefix/EVA", String.class);
-        assertThat(body, containsString("EVA-L09"));
-        assertThat(body, containsString("custTest847"));
+        assertThat(body, containsString("EVA"));
+        assertThat(body, containsString("cust_test_1"));
+        assertThat(body, containsString("cust_test_4"));
 
-        assertThat(body, not(containsString("566")));
+        assertThat(body, not(containsString("cust_test_2")));
+        assertThat(body, not(containsString("cust_test_3")));
     }
 
     /**
@@ -44,99 +200,114 @@ public class ImgMetaDataSearchTest {
      */
     @Test
     public void searchPrefixInKeysOfAllUsersTest(){
-        // The Keyset for the search, which is send in the post request.
+        String testUrl = "/img_metadata/search/prefix/inKeys/";
         String jsonKeySet = "[\"City\"]";
         String searchTerm = "City";
         //String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonKeySet, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/" + searchTerm, HttpMethod.POST, entity, String.class, "");
-        String body = response.getBody();
+        String body = performSearchTestWithParameter(searchTerm, jsonKeySet, testUrl);
 
         //Should be the only answer image:
-        assertThat( body, containsString("custTest2"));
-        assertThat( body, containsString("566"));
-        assertThat( body, containsString("1"));
+        assertThat( body, containsString("cust_test_2"));
+        assertThat( body, containsString("cust_test_3"));
+        assertThat(body, containsString("City"));
 
         //Should not be in the answer images
-        assertThat(body,not(containsString("custTest847")));
+        assertThat(body,not(containsString("cust_test_1")));
+        assertThat(body,not(containsString("cust_test_4")));
+
+        // Negativ Test: Check that "EVA", which is in other images on other keys, should not return any images
+        String searchTerm2 = "EVA";
+
+        body = performSearchTestWithParameter(searchTerm2, jsonKeySet, testUrl);
+
+        assertThat(body, is("[]"));
     }
 
 
-    //todo tbd
-    public void searchPrefixInAllKeysOfUsersTest(){}
+    @Test
+    public void searchPrefixInAllKeysOfUsersTest(){
+        String testUrl = "/img_metadata/search/prefix/ofUsers/";
+        String jsonUserSet1 = "[\"uid_test_3\"]";
+        String searchTerm1 = "City";
+
+        String bodyTest1 = performSearchTestWithParameter(searchTerm1, jsonUserSet1, testUrl);
+
+        assertThat(bodyTest1, containsString("City"));
+        assertThat(bodyTest1, containsString("cust_test_3"));
+        assertThat(bodyTest1, not(containsString("cust_test_1")));
+        assertThat(bodyTest1, not(containsString("cust_test_2")));
+        assertThat(bodyTest1, not(containsString("cust_test_4")));
+
+        String jsonUserSet2 = "[\"uid_test_2\"]";
+        String searchTerm2 = "EVA";
+        String bodyTest2 = performSearchTestWithParameter(searchTerm2, jsonUserSet2, testUrl);
+
+        assertThat(bodyTest2, is("[]"));
+    }
 
 
     /**
+     * Positive test:
      * Checks if a search returns an image that is from the user and contains the searchTerm
      *
+     * Negativ tests:
      * Check also if:
-     * A image from the same user that does not contain the search term will not returned
-     *
-     * AND
-     *
-     * A image from another user that does contain the search term will not returned
+     * - A image from the same user that does not contain the search term will not returned
+     * - image from another user that does contain the search term will not returned
      *
      */
     @Test
     public void searchPrefixInKeysOfUsersTest(){
-        String jsonParametersPOS = "{\"keys\":[\"Model\"], \"users\":[\"uid_test\"]}";
-        String searchTermPOS = "EVA";
+        String testUrl = "/img_metadata//search/prefix/inKeys/ofUsers/";
+        String jsonParameter1 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_3\"]}";
+        String searchTerm1 = "EVA";
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> entity = new HttpEntity<String>(jsonParametersPOS, headers);
+        String bodyTest1 = performSearchTestWithParameter(searchTerm1, jsonParameter1, testUrl);
 
-        ResponseEntity<String> response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermPOS, HttpMethod.POST, entity, String.class, "");
-        String bodyPOS = response.getBody();
+        assertThat("Tried valied search, needs to find image: cust_test_4, 1000, 1, (uid_test_3)", bodyTest1, containsString("EVA-L09"));
+        assertThat("Tried valied search, needs to find image: cust_test_4, 1000, 1, (uid_test_3)", bodyTest1, containsString("cust_test_4"));
 
-        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, containsString("EVA-L09"));
-        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, containsString("uid_test"));
-        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, not(containsString("uid1")));
-        assertThat("Tried valied search, needs to find image: custTest847, 10043, 2, (uid_test)", bodyPOS, not(containsString("custTest3")));
-
+        assertThat("Tried valied search, needs to find image: cust_test_4, 1000, 1, (uid_test_3)", bodyTest1, not(containsString("cust_test_1")));
+        assertThat("Tried valied search, needs to find image: cust_test_4, 1000, 1, (uid_test_3)", bodyTest1, not(containsString("cust_test_2")));
+        assertThat("Tried valied search, needs to find image: cust_test_4, 1000, 1, (uid_test_3)", bodyTest1, not(containsString("cust_test_3")));
 
 
         /// Check if images get returned if an empty (not existing) user is set
-        String jsonParametersNEG = "{\"keys\":[\"Model\"], \"users\":[\"uid_empty\"]}";
-        String searchTermNEG = "EVA";
+        String jsonParameter2 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_empty\"]}";
+        String searchTerm2 = "EVA";
 
-        headers = new HttpHeaders();
-        entity = new HttpEntity<String>(jsonParametersNEG, headers);
+        String bodyTest2 = performSearchTestWithParameter(searchTerm2, jsonParameter2, testUrl);
 
-        response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermNEG, HttpMethod.POST, entity, String.class, "");
-        String bodyNEG = response.getBody();
-
-        assertThat("Tried not existing user",bodyNEG, is("[]"));
+        assertThat("Tried not existing user",bodyTest2, is("[]"));
 
 
-        /// Check if images get returned if an empty (not existing) searchTerm is set
+        /// Check if images get returned if the search term exists for another user
 
-        jsonParametersNEG = "{\"keys\":[\"Model\"], \"users\":[\"uid_test\"]}";
-        searchTermNEG = "xyz";
+        String jsonParameter3 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_2\"]}";
+        String searchTerm3 = "EVA";
 
-        headers = new HttpHeaders();
-        entity = new HttpEntity<String>(jsonParametersNEG, headers);
+        String bodyTest3 = performSearchTestWithParameter(searchTerm3, jsonParameter3, testUrl);
 
-        response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermNEG, HttpMethod.POST, entity, String.class, "");
-        bodyNEG = response.getBody();
+        assertThat("Tried not search term that exists only for other user", bodyTest3, is("[]"));
 
-        assertThat("Tried not existing searchTerm", bodyNEG, is("[]"));
+        /// Check if images get returned if the search term exists for the selected user but not in the selected keys
 
-        /// Check if images get returned if an empty (not existing) key is set
+        String jsonParameter4 = "{\"keys\":[\"City\"], \"users\":[\"uid_test_3\"]}";
+        String searchTerm4 = "EVA";
 
-        jsonParametersNEG = "{\"keys\":[\"Empty\"], \"users\":[\"uid_test\"]}";
-        searchTermNEG = "EVA";
+        String bodyTest4 = performSearchTestWithParameter(searchTerm4, jsonParameter4, testUrl);
 
-        headers = new HttpHeaders();
-        entity = new HttpEntity<String>(jsonParametersNEG, headers);
+        assertThat("Tried not search term that exists only for other user", bodyTest4, is("[]"));
+    }
 
-        response = restTemplate.exchange("/img_metadata//search/prefix/inKeys/ofUsers/" + searchTermNEG, HttpMethod.POST, entity, String.class, "");
-        bodyNEG = response.getBody();
 
-        assertThat("Tried not existing key", bodyNEG, is("[]"));
+    private String performSearchTestWithParameter(String searchTerm, String jsonParameter, String url){
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<String>(jsonParameter, headers);
+
+        ResponseEntity<String> response = restTemplate.exchange(url + searchTerm, HttpMethod.POST, entity, String.class, "");
+        return response.getBody();
     }
 }
