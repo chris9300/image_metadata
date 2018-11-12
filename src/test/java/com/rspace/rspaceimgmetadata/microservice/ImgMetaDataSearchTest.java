@@ -28,11 +28,11 @@ public class ImgMetaDataSearchTest {
     @Test
     public void searchPrefixTest(){
         //Searches a term that should return nothing
-        String emptyBody = this.restTemplate.getForObject("/img_metadata/search/xyz", String.class);
+        String emptyBody = this.restTemplate.getForObject("/img_metadata/search/prefix/xyz", String.class);
         assertThat(emptyBody, is("[]"));
 
         //Searches a term that should return results but NOT an image with the id 566
-        String body = this.restTemplate.getForObject("/img_metadata/search/EVA", String.class);
+        String body = this.restTemplate.getForObject("/img_metadata/search/prefix/EVA", String.class);
         assertThat(body, containsString("EVA-L09"));
         assertThat(body, containsString("custTest847"));
 
