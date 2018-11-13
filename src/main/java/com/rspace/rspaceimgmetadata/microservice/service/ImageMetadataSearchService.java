@@ -194,8 +194,7 @@ public class ImageMetadataSearchService {
 
         return selectedElement.toString();
     }
-
-    //todo: Function that creates the search tags (prefix / suffix)
+    
 }
 
 
