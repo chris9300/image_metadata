@@ -26,7 +26,7 @@ public class ImgMetaDataAcceptanceTest {
 		assertEquals("OK",body);
 	}
 
-	//@Test
+	@Test
 	public void ImageInsertTest(){
 		LinkedMultiValueMap<String, Object> parameters = new LinkedMultiValueMap<String, Object>();
 
@@ -42,7 +42,7 @@ public class ImgMetaDataAcceptanceTest {
 
 
 		// Expect HTTP Ok
-		assertEquals(response.getStatusCode().toString(), HttpStatus.OK.toString());
+		assertEquals(response.getStatusCode().toString(), HttpStatus.NO_CONTENT.toString());
 
 		//todo: Check if the data is really in the database
 
