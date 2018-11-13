@@ -1,15 +1,20 @@
 package com.rspace.rspaceimgmetadata.microservice.service;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.rspace.rspaceimgmetadata.microservice.repository.ImageMetadataJsonSearchRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 
 @Service
 public class ImageMetadataSearchService {
@@ -167,19 +172,34 @@ public class ImageMetadataSearchService {
      * @return
      */
     private String createJsonKeyPathsArr(String jsonKeyString){
-        // add path prefix to first element
-        jsonKeyString = jsonKeyString.replace("[\"", "[\"$.");
 
-        // add path prefix to all later elements
-        //todo DOES NOT WORK CORRECT!!! USE JACKSON API, convert to json and add prefix to each element
-        jsonKeyString = jsonKeyString.replace(",\"", ", \"$.");
-        jsonKeyString = jsonKeyString.replace(", \"", ", \"$.");
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonPathArray = "";
 
-        return jsonKeyString;
+        try {
+            JsonNode jsonKeys = mapper.readTree(jsonKeyString);
+
+            ArrayList<String> keyList = new ArrayList<String>();
+            jsonKeys.forEach((JsonNode node) -> keyList.add("$." + node.asText()));
+
+            jsonPathArray = mapper.writeValueAsString(keyList);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            //todo: Handle json Errors
+        }
+
+        return jsonPathArray;
     }
 
 
-    //todo exception handling  --> create wrongJsonParameterException?
+    /**
+     * Extracts the value for the key String and returns the result as String
+     * @param key
+     * @param jsonParameter
+     * @return
+     */
     private String extractJsonArrayWithKey(String key, String jsonParameter){
         ObjectMapper mapper = new ObjectMapper();
 
@@ -188,6 +208,7 @@ public class ImageMetadataSearchService {
             json = mapper.readTree(jsonParameter);
         } catch (IOException e) {
             e.printStackTrace();
+            //todo exception handling  --> create wrongJsonParameterException?
         }
 
         JsonNode selectedElement = json.findPath(key);
