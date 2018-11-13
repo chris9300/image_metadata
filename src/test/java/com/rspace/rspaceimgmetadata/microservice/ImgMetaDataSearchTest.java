@@ -31,9 +31,11 @@ public class ImgMetaDataSearchTest {
      */
     @Test
     public void searchTermTest(){
+        String testUrl = "/img_metadata/search/";
+
         //Searches an existing Term
-        String searchTerm1 = "EVA_L09";
-        String testBody1 = this.restTemplate.getForObject("/img_metadata/search/" + searchTerm1, String.class);
+        String searchTerm1 = "EVA-L09";
+        String testBody1 = this.restTemplate.getForObject( testUrl + searchTerm1, String.class);
         assertThat(testBody1, containsString("EVA-L09"));
         assertThat(testBody1, containsString("cust_test_1"));
         assertThat(testBody1, containsString("cust_test_4"));
@@ -41,15 +43,25 @@ public class ImgMetaDataSearchTest {
         assertThat(testBody1, not(containsString("cust_test_2")));
         assertThat(testBody1, not(containsString("cust_test_3")));
 
+        String searchTerm2 = "eva-l09";  // Searches for same search tag, but know in lower cases
+        String testBody2 = this.restTemplate.getForObject( testUrl + searchTerm2, String.class);
+
+        assertThat(testBody2, containsString("EVA-L09"));  // the matched string should be in original cases
+        assertThat(testBody1, containsString("cust_test_1"));
+        assertThat(testBody1, containsString("cust_test_4"));
+
+        assertThat(testBody1, not(containsString("cust_test_2")));
+        assertThat(testBody1, not(containsString("cust_test_3")));
+
         //Searches an existing prefix, should not return anything
-        String searchTerm2 = "EVA";
-        String testBody2 = this.restTemplate.getForObject("/img_metadata/search/" + searchTerm2, String.class);
-        assertThat(testBody2, is("[]"));
+        String searchTerm3 = "EVA";
+        String testBody3 = this.restTemplate.getForObject(testUrl + searchTerm3, String.class);
+        assertThat(testBody3, is("[]"));
 
         //Searches a term that should return nothing
-        String searchTerm3 = "xyz";
-        String emptyBody = this.restTemplate.getForObject("/img_metadata/search/" + searchTerm3, String.class);
-        assertThat(emptyBody, is("[]"));
+        String searchTerm4 = "xyz";
+        String testBody4 = this.restTemplate.getForObject(testUrl + searchTerm4, String.class);
+        assertThat(testBody4, is("[]"));
     }
 
 
@@ -123,9 +135,9 @@ public class ImgMetaDataSearchTest {
         // Search prefix that exists for selected user
         String jsonUserSet3 = "[\"uid_test_3\"]";
         String searchTerm3 = "City";
-        String bodyTest3 = performSearchTestWithParameter(searchTerm2, jsonUserSet2, testUrl);
+        String bodyTest3 = performSearchTestWithParameter(searchTerm3, jsonUserSet3, testUrl);
 
-        assertThat(bodyTest2, is("[]"));
+        assertThat(bodyTest3, is("[]"));
     }
 
     @Test

@@ -39,7 +39,8 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
                     // will not be considered from the json table operator
             "      JSON_MERGE(" +
             "        '[]', " +
-            "        JSON_SEARCH(i.metadata,'all', :term)" +
+                    //The LOWER Tags are neccissary for the case sensitiv search
+            "        JSON_SEARCH(LOWER(i.metadata),'all', LOWER(:term))" +
             "        )," +
             "    \"$[*]\"" +
             "        COLUMNS(key_path char(50) PATH '$')" +
@@ -50,7 +51,8 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
      */
     String queryPartWhereNotNull =
             "where" +
-            "  JSON_SEARCH(i.metadata,'all', :term) IS NOT NULL ";
+               //The LOWER Tags are neccissary for the case sensitiv search
+            "  JSON_SEARCH(LOWER(i.metadata),'all', LOWER(:term)) IS NOT NULL ";
 
     /**
      * Param:  :jsonKeys

@@ -45,7 +45,9 @@ public class ImageMetadataParser {
             // Split the key/val pair at the first ": "
             String[] pair = item.toString().replace("'","").split(": ", 2);
 
-            String key = pair[0];
+            // The keys have to inserted in lower cases because of the case-insensitiv search.
+            // Upper-Case keys would not working
+            String key = pair[0].toLowerCase();
             String nextVal = pair[1];
 
             if (metadataMap.containsKey(key)){
