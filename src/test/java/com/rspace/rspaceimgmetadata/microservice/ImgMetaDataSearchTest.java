@@ -90,17 +90,34 @@ public class ImgMetaDataSearchTest {
         assertThat(testBody1,not(containsString("cust_test_1")));
         assertThat(testBody1,not(containsString("cust_test_4")));
 
+        // Use several keys in the json key array
+        String jsonKeySet2 = "[\"Model\", \"City\"]";
+        String searchTerm2 = "City (Core) (ref2017.1)";
+        //String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
+
+        String testBody2 = performSearchTestWithParameter(searchTerm1, jsonKeySet, testUrl);
+
+        //Should be the only answer image:
+        assertThat(testBody2, containsString("City (Core) (ref2017.1)"));
+        assertThat(testBody2, containsString("cust_test_2"));
+        assertThat(testBody2, containsString("cust_test_3"));
+
+        //Should not be in the answer images
+        assertThat(testBody2,not(containsString("cust_test_1")));
+        assertThat(testBody2,not(containsString("cust_test_4")));
+
+
         // Negativ Test: Check that "EVA", which is in other images on other keys, should not return any images
-        String searchTerm2 = "EVA-L09";
-        String testBody2 = performSearchTestWithParameter(searchTerm2, jsonKeySet, testUrl);
-
-        assertThat(testBody2, is("[]"));
-
-        // Negativ Test: Check that "City", which is only a prefix, should not return any images
-        String searchTerm3 = "City";
+        String searchTerm3 = "EVA-L09";
         String testBody3 = performSearchTestWithParameter(searchTerm3, jsonKeySet, testUrl);
 
         assertThat(testBody3, is("[]"));
+
+        // Negativ Test: Check that "City", which is only a prefix, should not return any images
+        String searchTerm4 = "City";
+        String testBody4 = performSearchTestWithParameter(searchTerm4, jsonKeySet, testUrl);
+
+        assertThat(testBody4, is("[]"));
     }
 
     /**
@@ -125,19 +142,31 @@ public class ImgMetaDataSearchTest {
         assertThat(bodyTest1, not(containsString("cust_test_2")));
         assertThat(bodyTest1, not(containsString("cust_test_4")));
 
-        // Search term that only exists for other users
-        String jsonUserSet2 = "[\"uid_test_1\"]";
+        // Use several user_ids
+        String jsonUserSet2 = "[\"uid_test_2\", \"uid_test_3\"]";
         String searchTerm2 = "City (Core) (ref2017.1)";
+
         String bodyTest2 = performSearchTestWithParameter(searchTerm2, jsonUserSet2, testUrl);
 
-        assertThat(bodyTest2, is("[]"));
+        assertThat(bodyTest2, containsString("City"));
+        assertThat(bodyTest2, containsString("cust_test_3"));
+        assertThat(bodyTest2, containsString("cust_test_2"));
+        assertThat(bodyTest2, not(containsString("cust_test_1")));
+        assertThat(bodyTest2, not(containsString("cust_test_4")));
 
-        // Search prefix that exists for selected user
-        String jsonUserSet3 = "[\"uid_test_3\"]";
-        String searchTerm3 = "City";
+        // Search term that only exists for other users
+        String jsonUserSet3 = "[\"uid_test_1\"]";
+        String searchTerm3 = "City (Core) (ref2017.1)";
         String bodyTest3 = performSearchTestWithParameter(searchTerm3, jsonUserSet3, testUrl);
 
         assertThat(bodyTest3, is("[]"));
+
+        // Search prefix that exists for selected user
+        String jsonUserSet4 = "[\"uid_test_3\"]";
+        String searchTerm4 = "City";
+        String bodyTest4 = performSearchTestWithParameter(searchTerm4, jsonUserSet4, testUrl);
+
+        assertThat(bodyTest4, is("[]"));
     }
 
     @Test
