@@ -1,6 +1,7 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
+import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.DuplicateEntryException;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.WrongFileFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -42,6 +43,8 @@ public class ImageMetadataController {
             imageMetadataService.insertNewImageMetadata(orgData, imgFile);
         } catch (WrongFileFormatException e){
              return new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        } catch (DuplicateEntryException e){
+            return  new ResponseEntity<String>("Image metadata with the same ID are already in the database", HttpStatus.CONFLICT);
         }
 
         return new ResponseEntity<String>("Created", HttpStatus.NO_CONTENT);

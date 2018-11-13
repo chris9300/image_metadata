@@ -271,7 +271,7 @@ public class ImgMetaDataSearchTest {
      */
     @Test
     public void searchPrefixInKeysOfUsersTest(){
-        String testUrl = "/img_metadata//search/prefix/inKeys/ofUsers/";
+        String testUrl = "/img_metadata/search/prefix/inKeys/ofUsers/";
         String jsonParameter1 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_3\"]}";
         String searchTerm1 = "EVA";
 

@@ -35,9 +35,19 @@ public class ImageMetadataService {
      * Insert the metadata of the imgFile to the database
      * @param imageMetadataDO
      * @param imgFile
+     * @exception WrongFileFormatException Thrown if the Metadata can not be extracted from the image file (Assumes, that the format is wrong)
+     * @exception DuplicateEntryException Thrown if the key if the new ImageMetadataEntity already exists
      */
-    public void insertNewImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile)throws WrongFileFormatException {
-        updateImageMetadata(imageMetadataDO,imgFile);
+    public void insertNewImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile)
+            throws WrongFileFormatException, DuplicateEntryException {
+        addMetadataToEntityObject(imageMetadataDO, imgFile);
+
+        // Throws Exception if an object with the key already exists
+        if(metadataRepository.existsById(imageMetadataDO.getCustRspaceImageVersion())){
+            throw new DuplicateEntryException("");
+        }
+
+        metadataRepository.save(imageMetadataDO);
     }
 
 
@@ -48,7 +58,22 @@ public class ImageMetadataService {
      * @param imageMetadataDO
      * @param imgFile
      */
-    public void updateImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile) throws WrongFileFormatException{
+    public void updateImageMetadata(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile)
+            throws WrongFileFormatException{
+        addMetadataToEntityObject(imageMetadataDO, imgFile);
+
+        metadataRepository.save(imageMetadataDO);
+    }
+
+    /**
+     * Extractes the metadata from the imgFile and added the extracted metadata as json to the imageMetadata Data Object
+     * @param imageMetadataDO ImageMetadata Data Object
+     * @param imgFile Image File
+     * @return
+     * @throws WrongFileFormatException Thrown if the Metadata can not be extracted from the image file (Assumes, that the format is wrong)
+     */
+    private ImageMetadataEntity addMetadataToEntityObject(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile)
+            throws WrongFileFormatException{
         try {
             ImageMetadata metadata = Imaging.getMetadata(imgFile.getInputStream(), imgFile.getName());
             String jsonMetadata = ImageMetadataParser.parseToJson(metadata);
@@ -58,15 +83,21 @@ public class ImageMetadataService {
         } catch (IOException ioex) {
             ioex.printStackTrace();
         } catch (ImageReadException e) {
-            e.printStackTrace();
+            // This should only thrown if the data is from the wrong file format
             throw new WrongFileFormatException("");
         }
 
-        metadataRepository.save(imageMetadataDO);
+        return imageMetadataDO;
     }
 
     public class WrongFileFormatException extends Exception {
         public WrongFileFormatException(String message) {
+            super(message);
+        }
+    }
+
+    public class DuplicateEntryException extends Exception{
+        public DuplicateEntryException(String message) {
             super(message);
         }
     }

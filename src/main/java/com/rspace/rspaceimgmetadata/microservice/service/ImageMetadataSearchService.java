@@ -171,7 +171,7 @@ public class ImageMetadataSearchService {
         jsonKeyString = jsonKeyString.replace("[\"", "[\"$.");
 
         // add path prefix to all later elements
-        //todo is this really save? Look for better way with jackson or in the sql query
+        //todo DOES NOT WORK CORRECT!!! USE JACKSON API, convert to json and add prefix to each element
         jsonKeyString = jsonKeyString.replace(",\"", ", \"$.");
         jsonKeyString = jsonKeyString.replace(", \"", ", \"$.");
 
@@ -194,7 +194,7 @@ public class ImageMetadataSearchService {
 
         return selectedElement.toString();
     }
-    
+
 }
 
 
