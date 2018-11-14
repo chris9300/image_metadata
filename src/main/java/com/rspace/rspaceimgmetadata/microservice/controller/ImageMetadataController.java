@@ -34,7 +34,7 @@ public class ImageMetadataController {
      * @param version
      * @param imgFile
      */
-    @PutMapping("/img_metadata/{customerId}/{userId}/{rspaceImageId}/{version}/insert")
+    @PutMapping("/img_metadata/insert/{customerId}/{userId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> insert(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
         ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
         orgData.setUserId(userId);
