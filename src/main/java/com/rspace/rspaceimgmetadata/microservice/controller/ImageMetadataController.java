@@ -1,5 +1,6 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
+import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.DuplicateEntryException;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.WrongFileFormatException;
@@ -58,7 +59,7 @@ public class ImageMetadataController {
      * @param version
      * @param imgFile
      */
-    @PostMapping("/img_metadata/{customerId}/{userId}/{rspaceImageId}/{version}/update")
+    @PostMapping("/img_metadata/update/{customerId}/{userId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> update(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
         ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
         orgData.setUserId(userId);
@@ -80,12 +81,33 @@ public class ImageMetadataController {
      * @param version
      * @return Json String
      */
-    @GetMapping("/img_metadata/{customerId}/{rspaceImageId}/{version}/get")
+    @GetMapping("/img_metadata/get/{customerId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> get(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
 
         Optional<String> jsonResponseBody = imageMetadataService.getImageMetadata(customerId, rspaceImageId, version);
 
         return createJsonHTTPResponse(jsonResponseBody);
+    }
+
+    /**
+     * Deletes the associated image (key) in the database.
+     * If the image (key) is not found in the database a NotDatabaseEntryFoundException will be catched.
+     * In this case responses a Http NOT_FOUND
+     * @param customerId
+     * @param rspaceImageId
+     * @param version
+     * @return Http OK will image can be deleted. Http NOT_FOUND if not.
+     */
+    @DeleteMapping("/img_metadata/delete/{customerId}/{rspaceImageId}/{version}")
+    public ResponseEntity<String> delete(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
+        ImageMetadataEmbeddedKey imageKey = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, version);
+
+        try {
+            imageMetadataService.deleteImageMetadata(imageKey);
+            return new ResponseEntity<String>("Deleted", HttpStatus.OK);
+        } catch (ImageMetadataService.NoDatabaseEntryFoundException e) {
+            return new ResponseEntity<String>("Could not delete!", HttpStatus.NOT_FOUND);
+        }
     }
 
     

@@ -73,6 +73,7 @@ public class ImgMetaDataSearchTest {
      * - Search for a exact term wich is in another key
      * - Search for a prefix of a term of the selected key
      */
+    @Test
     public void searchTermInKeysOfAllUsersTest(){
         String testUrl = "/img_metadata/search/inKeys/";
         String jsonKeySet = "[\"City\"]";

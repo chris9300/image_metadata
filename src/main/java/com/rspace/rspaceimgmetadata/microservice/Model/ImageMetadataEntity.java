@@ -1,5 +1,7 @@
 package com.rspace.rspaceimgmetadata.microservice.Model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -9,9 +11,11 @@ public class ImageMetadataEntity {
     //@GeneratedValue(strategy = GenerationType.IDENTITY)
     //@Column(name = "db_id", columnDefinition = "integer not null auto_increment")
     @Column(name = "id")
+    @JsonIgnore
     private Integer imageId;
 
     @EmbeddedId
+    @JsonIgnore // should ignore because otherwise would be duplicated in the json
     private ImageMetadataEmbeddedKey custRspaceImageVersion;
 
     @Column(name = "user_id")

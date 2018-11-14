@@ -1,12 +1,16 @@
 package com.rspace.rspaceimgmetadata.microservice.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
 import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
 import com.rspace.rspaceimgmetadata.microservice.repository.ImageMetadataRepository;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
+import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,10 +30,11 @@ public class ImageMetadataService {
         Optional<ImageMetadataEntity> dbResult = metadataRepository.findById(key);
         Optional<String> jsonResult = Optional.empty();
         if(dbResult.isPresent()){
-            jsonResult = Optional.of(dbResult.get().getJsonMetadata());
+            jsonResult = imageMetadataEntityToJson(dbResult.get());
         }
         return jsonResult;
     }
+
 
     /**
      * Insert the metadata of the imgFile to the database
@@ -66,6 +71,30 @@ public class ImageMetadataService {
     }
 
     /**
+     * Creates a json String from one ImageMetadataEntity Object.
+     * If it is not possible to create the json String, the return value will be Optional.empty
+     * @param imageMetadataEntity
+     * @return jsonString of the ImageMetadataEntity Object or Optional.empty
+     */
+    private Optional<String> imageMetadataEntityToJson(ImageMetadataEntity imageMetadataEntity){
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            return Optional.of(mapper.writeValueAsString(imageMetadataEntity));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
+    public void deleteImageMetadata(ImageMetadataEmbeddedKey imageKey) throws NoDatabaseEntryFoundException {
+        try {
+            metadataRepository.deleteById(imageKey);
+        } catch (EmptyResultDataAccessException e){
+            throw new NoDatabaseEntryFoundException("");
+        }
+    }
+
+    /**
      * Extractes the metadata from the imgFile and added the extracted metadata as json to the imageMetadata Data Object
      * @param imageMetadataDO ImageMetadata Data Object
      * @param imgFile Image File
@@ -98,6 +127,12 @@ public class ImageMetadataService {
 
     public class DuplicateEntryException extends Exception{
         public DuplicateEntryException(String message) {
+            super(message);
+        }
+    }
+
+    public class NoDatabaseEntryFoundException extends  Exception {
+        public NoDatabaseEntryFoundException(String message) {
             super(message);
         }
     }
