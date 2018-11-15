@@ -69,6 +69,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skipTests>false</skipTests>
+                    <testFailureIgnore>true</testFailureIgnore>
+                    <forkMode>once</forkMode>
+                </configuration>
             </plugin>
         </plugins>
     </build>
