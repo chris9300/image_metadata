@@ -8,7 +8,6 @@ import com.rspace.rspaceimgmetadata.microservice.repository.ImageMetadataReposit
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.ImageMetadata;
-import org.aspectj.weaver.ast.Not;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -48,7 +47,7 @@ public class ImageMetadataService {
         addMetadataToEntityObject(imageMetadataDO, imgFile);
 
         // Throws Exception if an object with the key already exists
-        if(metadataRepository.existsById(imageMetadataDO.getCustRspaceImageVersion())){
+        if(metadataRepository.existsById(imageMetadataDO.getEmbeddedKey())){
             throw new DuplicateEntryException("");
         }
 
