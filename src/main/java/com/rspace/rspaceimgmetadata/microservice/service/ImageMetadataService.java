@@ -7,6 +7,7 @@ import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
 import com.rspace.rspaceimgmetadata.microservice.repository.ImageMetadataRepository;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
+import org.apache.commons.imaging.common.IImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -103,7 +104,7 @@ public class ImageMetadataService {
     private ImageMetadataEntity addMetadataToEntityObject(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile)
             throws WrongFileFormatException{
         try {
-            ImageMetadata metadata = Imaging.getMetadata(imgFile.getInputStream(), imgFile.getName());
+            IImageMetadata metadata = Imaging.getMetadata(imgFile.getInputStream(), imgFile.getName());
             String jsonMetadata = ImageMetadataParser.parseToJson(metadata);
 
             imageMetadataDO.setJsonMetadata(jsonMetadata);
