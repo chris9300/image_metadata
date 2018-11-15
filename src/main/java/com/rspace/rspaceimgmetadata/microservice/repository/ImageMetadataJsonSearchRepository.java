@@ -43,7 +43,7 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
             "        JSON_SEARCH(LOWER(i.metadata),'all', LOWER(:term))" +
             "        )," +
             "    \"$[*]\"" +
-            "        COLUMNS(key_path char(50) PATH '$')" +
+            "        COLUMNS(key_path varchar(255) PATH '$')" +
             "  ) as search ";
 
     /**
@@ -65,7 +65,7 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
             "    JSON_TABLE(" +
             "      :jsonKeys," +
             "      \"$[*]\"" +
-            "      COLUMNS(target_keys char(50) PATH '$')" +
+            "      COLUMNS(target_keys varchar(255) PATH '$')" +
             "    ) as tar" +
             "  )";
 
@@ -80,7 +80,7 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
             "    JSON_TABLE(" +
             "      :jsonUsers," +
 			"	   \"$[*]\"" +
-            "      COLUMNS(uid char(50) PATH '$')" +
+            "      COLUMNS(uid varchar(255) PATH '$')" +
             "    ) as u" +
 		    "  )";
 
