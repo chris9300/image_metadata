@@ -2,6 +2,10 @@ package com.rspace.rspaceimgmetadata.microservice.controller;
 
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -12,8 +16,9 @@ public class ImageMetadataSearchController {
 
 
     @GetMapping("/img_metadata/search/{searchTerm}")
-    public String searchInAll(@PathVariable String searchTerm){
-        return searchService.searchTermInAll(searchTerm);
+    public ResponseEntity<String> searchInAll(@PathVariable String searchTerm){
+        String jsonStrResult = searchService.searchTermInAll(searchTerm);
+        return createJsonResponseEntity(jsonStrResult);
     }
 
 
@@ -24,8 +29,17 @@ public class ImageMetadataSearchController {
      * @return
      */
     @PostMapping("/img_metadata/search/inKeys/{searchTerm}")
-    public String searchInKeysOfAllUsers(@PathVariable String searchTerm, @RequestBody String jsonKeys){
-        return searchService.searchTermInKeysOfAllUsers(searchTerm, jsonKeys);
+    public ResponseEntity<String> searchInKeysOfAllUsers(@PathVariable String searchTerm, @RequestBody String jsonKeys){
+
+        // Validate json Input
+        InputValidator validator = new InputValidator();
+        validator.addJsonKeyArr(jsonKeys);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
+        String jsonStrResult = searchService.searchTermInKeysOfAllUsers(searchTerm, jsonKeys);
+        return createJsonResponseEntity(jsonStrResult);
     }
 
     /**
@@ -37,8 +51,16 @@ public class ImageMetadataSearchController {
      * @return
      */
     @PostMapping("/img_metadata/search/ofUsers/{searchTerm}")
-    public String searchInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
-        return searchService.searchTermInAllKeysOfUsers(searchTerm, jsonUsers);
+    public ResponseEntity<String> searchInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
+        // Validate json Input
+        InputValidator validator = new InputValidator();
+        validator.addJsonUserIdArr(jsonUsers);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
+        String jsonStrResult = searchService.searchTermInAllKeysOfUsers(searchTerm, jsonUsers);
+        return createJsonResponseEntity(jsonStrResult);
     }
 
     /**
@@ -53,8 +75,16 @@ public class ImageMetadataSearchController {
      * @return
      */
     @PostMapping("/img_metadata/search/inKeys/ofUsers/{searchTerm}")
-    public String searchInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
-        return searchService.searchTermInKeysOfUsers(searchTerm, jsonParameter);
+    public ResponseEntity<String> searchInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
+        // Validate json Input
+        InputValidator validator = new InputValidator();
+        validator.addJsonParameterObject(jsonParameter);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
+        String jsonStrResult =searchService.searchTermInKeysOfUsers(searchTerm, jsonParameter);
+        return createJsonResponseEntity(jsonStrResult);
     }
 
     /// ------------------ Prefix Searches ------------------
@@ -65,8 +95,9 @@ public class ImageMetadataSearchController {
      * @return
      */
     @GetMapping("/img_metadata/search/prefix/{searchPrefix}")
-    public String searchPrefixInAll(@PathVariable String searchPrefix){
-        return searchService.searchPrefixInAll(searchPrefix);
+    public ResponseEntity<String> searchPrefixInAll(@PathVariable String searchPrefix){
+        String jsonStrResult = searchService.searchPrefixInAll(searchPrefix);
+        return createJsonResponseEntity(jsonStrResult);
     }
 
 
@@ -77,8 +108,16 @@ public class ImageMetadataSearchController {
      * @return
      */
     @PostMapping("/img_metadata/search/prefix/inKeys/{searchTerm}")
-    public String searchPrefixInKeysOfAllUsers(@PathVariable String searchTerm, @RequestBody String jsonKeys){
-        return searchService.searchPrefixInKeysOfAllUsers(searchTerm, jsonKeys);
+    public ResponseEntity<String> searchPrefixInKeysOfAllUsers(@PathVariable String searchTerm, @RequestBody String jsonKeys){
+        // Validate json Input
+        InputValidator validator = new InputValidator();
+        validator.addJsonKeyArr(jsonKeys);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
+        String jsonStrResult = searchService.searchPrefixInKeysOfAllUsers(searchTerm, jsonKeys);
+        return createJsonResponseEntity(jsonStrResult);
     }
 
     /**
@@ -90,8 +129,17 @@ public class ImageMetadataSearchController {
      * @return
      */
     @PostMapping("/img_metadata/search/prefix/ofUsers/{searchTerm}")
-    public String searchPrefixInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
-        return searchService.searchPrefixInAllKeysOfUsers(searchTerm, jsonUsers);
+    public ResponseEntity<String> searchPrefixInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
+        // Validate json Input
+        InputValidator validator = new InputValidator();
+        validator.addJsonUserIdArr(jsonUsers);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
+
+        String jsonStrResult = searchService.searchPrefixInAllKeysOfUsers(searchTerm, jsonUsers);
+        return createJsonResponseEntity(jsonStrResult);
     }
 
     /**
@@ -106,7 +154,21 @@ public class ImageMetadataSearchController {
      * @return
      */
     @PostMapping("/img_metadata/search/prefix/inKeys/ofUsers/{searchTerm}")
-    public String searchPrefixInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
-        return searchService.searchPrefixInKeysOfUsers(searchTerm, jsonParameter);
+    public ResponseEntity<String> searchPrefixInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
+        // Validate json Input
+        InputValidator validator = new InputValidator();
+        validator.addJsonParameterObject(jsonParameter);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
+        String jsonStrResult = searchService.searchPrefixInKeysOfUsers(searchTerm, jsonParameter);
+        return createJsonResponseEntity(jsonStrResult);
+    }
+
+    private ResponseEntity<String> createJsonResponseEntity(String jsonStringBody){
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<String>(jsonStringBody, responseHeaders, HttpStatus.OK);
     }
 }
