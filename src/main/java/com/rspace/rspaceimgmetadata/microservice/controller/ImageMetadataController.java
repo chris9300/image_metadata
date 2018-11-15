@@ -1,5 +1,6 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.DuplicateEntryException;
@@ -15,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -37,9 +40,17 @@ public class ImageMetadataController {
      */
     @PutMapping("/img_metadata/insert/{customerId}/{userId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> insert(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
+        InputValidator validator = new InputValidator();
+        validator.addFile(imgFile);
+        if(!validator.isValid()){
+            return validator.getLastHtmlErrorResponse().get();
+        }
+
         ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
         orgData.setUserId(userId);
 
+
+        //todo can this try catch be removed? Because the validator will check all this before.
         try {
             imageMetadataService.insertNewImageMetadata(orgData, imgFile);
         } catch (WrongFileFormatException e){
@@ -132,4 +143,5 @@ public class ImageMetadataController {
         }
 
     }
+
 }
