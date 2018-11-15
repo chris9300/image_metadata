@@ -1,8 +1,6 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
-import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.DuplicateEntryException;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.WrongFileFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -40,19 +36,17 @@ public class ImageMetadataController {
      */
     @PutMapping("/img_metadata/insert/{customerId}/{userId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> insert(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
-        InputValidator validator = new InputValidator();
+        ImageMetadataEntity inputData = new ImageMetadataEntity(customerId, rspaceImageId, version);
+        inputData.setUserId(userId);
+
+        InputValidator validator = new InputValidator(inputData);
         validator.addFile(imgFile);
         if(!validator.isValid()){
-            return validator.getLastHtmlErrorResponse().get();
+            return validator.getLastErrorResponse().get();
         }
 
-        ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
-        orgData.setUserId(userId);
-
-
-        //todo can this try catch be removed? Because the validator will check all this before.
         try {
-            imageMetadataService.insertNewImageMetadata(orgData, imgFile);
+            imageMetadataService.insertNewImageMetadata(inputData, imgFile);
         } catch (WrongFileFormatException e){
              return new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         } catch (DuplicateEntryException e){
@@ -72,10 +66,18 @@ public class ImageMetadataController {
      */
     @PostMapping("/img_metadata/update/{customerId}/{userId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> update(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
-        ImageMetadataEntity orgData = new ImageMetadataEntity(customerId, rspaceImageId, version);
-        orgData.setUserId(userId);
+
+        ImageMetadataEntity inputData = new ImageMetadataEntity(customerId, rspaceImageId, version);
+        inputData.setUserId(userId);
+
+        InputValidator validator = new InputValidator(inputData);
+        validator.addFile(imgFile);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
         try{
-        imageMetadataService.updateImageMetadata(orgData, imgFile);
+        imageMetadataService.updateImageMetadata(inputData, imgFile);
         } catch (WrongFileFormatException e){
             return new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         }
@@ -94,10 +96,16 @@ public class ImageMetadataController {
      */
     @GetMapping("/img_metadata/get/{customerId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> get(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
+        ImageMetadataEmbeddedKey imageKey = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, version);
+
+        InputValidator validator = new InputValidator(imageKey);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
 
         Optional<String> jsonResponseBody = imageMetadataService.getImageMetadata(customerId, rspaceImageId, version);
 
-        return createJsonHTTPResponse(jsonResponseBody);
+        return createJsonHttpGetResponse(jsonResponseBody);
     }
 
     /**
@@ -113,6 +121,11 @@ public class ImageMetadataController {
     public ResponseEntity<String> delete(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
         ImageMetadataEmbeddedKey imageKey = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, version);
 
+        InputValidator validator = new InputValidator(imageKey);
+        if(!validator.isValid()){
+            return validator.getLastErrorResponse().get();
+        }
+
         try {
             imageMetadataService.deleteImageMetadata(imageKey);
             return new ResponseEntity<String>("Deleted", HttpStatus.OK);
@@ -127,11 +140,11 @@ public class ImageMetadataController {
      * @return
      */
     @GetMapping
-    public ResponseEntity<String> status() {
+    private ResponseEntity<String> status() {
     	return new ResponseEntity<String>("OK", HttpStatus.OK);
     }
 
-    private ResponseEntity<String> createJsonHTTPResponse(Optional<String> jsonResonseBody){
+    private ResponseEntity<String> createJsonHttpGetResponse(Optional<String> jsonResonseBody){
 
         if(jsonResonseBody.isPresent()){
             HttpHeaders responseHeaders = new HttpHeaders();
