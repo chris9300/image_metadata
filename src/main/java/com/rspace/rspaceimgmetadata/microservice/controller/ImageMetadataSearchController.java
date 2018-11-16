@@ -166,6 +166,10 @@ public class ImageMetadataSearchController {
         return createJsonResponseEntity(jsonStrResult);
     }
 
+    /**
+     * Extracts all existing top-level keys of the database and return them (unique) as a json array
+     * @return json array with all top lvl keys
+     */
     @GetMapping("img_metadata/topKeys")
     public ResponseEntity<String> extractTopLevelKeys(){
         String jsonStrResult = searchService.extractAllTopLevelKeys();

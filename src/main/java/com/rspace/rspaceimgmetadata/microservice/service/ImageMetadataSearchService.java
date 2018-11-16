@@ -140,6 +140,10 @@ public class ImageMetadataSearchService {
     }
 
 
+    /**
+     * Extracts all existing top lvl keys of the metadata column in the database and returns them as json array
+     * @return json array with all top lvl keys
+     */
     public String extractAllTopLevelKeys(){
         ObjectMapper mapper = new ObjectMapper();
         ArrayList topLvlKeys = new ArrayList<String>(Arrays.asList(searchRepository.extractAllTopLevelKeys()));
@@ -154,6 +158,8 @@ public class ImageMetadataSearchService {
 
         return jsonKeyArray;
     }
+
+    
 
 
 
