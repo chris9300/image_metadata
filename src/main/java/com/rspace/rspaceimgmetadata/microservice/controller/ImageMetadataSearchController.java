@@ -166,6 +166,13 @@ public class ImageMetadataSearchController {
         return createJsonResponseEntity(jsonStrResult);
     }
 
+    @GetMapping("img_metadata/topKeys")
+    public ResponseEntity<String> extractTopLevelKeys(){
+        String jsonStrResult = searchService.extractAllTopLevelKeys();
+
+        return createJsonResponseEntity(jsonStrResult);
+    }
+
     private ResponseEntity<String> createJsonResponseEntity(String jsonStringBody){
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setContentType(MediaType.APPLICATION_JSON);

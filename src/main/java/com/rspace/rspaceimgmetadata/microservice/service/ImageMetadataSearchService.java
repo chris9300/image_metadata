@@ -2,6 +2,7 @@ package com.rspace.rspaceimgmetadata.microservice.service;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Service
 public class ImageMetadataSearchService {
@@ -135,6 +137,22 @@ public class ImageMetadataSearchService {
      */
     public String searchPrefixInAllKeysOfUsers(String searchPrefix, String jsonUsers){
         return searchTermInAllKeysOfUsers(searchPrefix + "%", jsonUsers);
+    }
+
+
+    public String extractAllTopLevelKeys(){
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayList topLvlKeys = new ArrayList<String>(Arrays.asList(searchRepository.extractAllTopLevelKeys()));
+
+        String jsonKeyArray = "";
+
+        try {
+            jsonKeyArray = mapper.writeValueAsString(topLvlKeys);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return jsonKeyArray;
     }
 
 
