@@ -4,6 +4,7 @@ package com.rspace.rspaceimgmetadata.microservice.service;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.imaging.common.IImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class ImageMetadataParser {
      * @param imgMetadata
      * @return
      */
-    public static String parseToJson(ImageMetadata imgMetadata){
+    public static String parseToJson(IImageMetadata imgMetadata){
         ImageMetadataParser parser = new ImageMetadataParser();
         final String json =  parser.toJson(imgMetadata);
 
@@ -33,13 +34,13 @@ public class ImageMetadataParser {
     }
 
 
-    public HashMap<String, Object> toHashmap(ImageMetadata imgMetadata){
-        List<? extends ImageMetadata.ImageMetadataItem> metadataList = imgMetadata.getItems();
+    public HashMap<String, Object> toHashmap(IImageMetadata imgMetadata){
+        List<? extends ImageMetadata.IImageMetadataItem> metadataList = imgMetadata.getItems();
 
         metadataMap = new HashMap<>();
 
         for (int i = 0; i < metadataList.size(); i++) {
-            ImageMetadata.ImageMetadataItem item = metadataList.get(i);
+            ImageMetadata.IImageMetadataItem item = metadataList.get(i);
 
             // Remove ' because the should not be in the json values
             // Split the key/val pair at the first ": "
@@ -78,7 +79,7 @@ public class ImageMetadataParser {
     }
 
 
-    public String toJson(ImageMetadata imgMetadata){
+    public String toJson(IImageMetadata imgMetadata){
 
         // The metadataList cannot directly be parsed into json.
         // That's why the tags are stored as key/value pairs in a hash map.
