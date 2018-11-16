@@ -118,7 +118,7 @@ public class ImageMetadataController {
      * @return Http OK will image can be deleted. Http NOT_FOUND if not.
      */
     @DeleteMapping("/img_metadata/delete/{customerId}/{rspaceImageId}/{version}")
-    public ResponseEntity<String> delete(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
+    private ResponseEntity<String> delete(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
         ImageMetadataEmbeddedKey imageKey = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, version);
 
         InputValidator validator = new InputValidator(imageKey);
@@ -141,7 +141,7 @@ public class ImageMetadataController {
      */
     @GetMapping
     private ResponseEntity<String> status() {
-    	return new ResponseEntity<String>("OK", HttpStatus.OK);
+    	return new ResponseEntity<String>("Service is running", HttpStatus.OK);
     }
 
     private ResponseEntity<String> createJsonHttpGetResponse(Optional<String> jsonResonseBody){
