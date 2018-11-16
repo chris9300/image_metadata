@@ -159,7 +159,32 @@ public class ImageMetadataSearchService {
         return jsonKeyArray;
     }
 
-    
+    /**
+     * Extracts all key paths from the database. The key lvls are separated by dots. The returned key paths don't contain
+     * the $. prefix. So they can directly used for the search.
+     * @return Json array of all key paths
+     */
+    public String extractAllKeys(){
+        // Get keyPath from the database. MySql returns keyPath with a $. prefix
+        String[] keyPathArr = searchRepository.extractAllKeyPaths();
+        ArrayList<String> keyPathList = new ArrayList<String>();
+
+        // Remove .$ prefix and create ArrayList (which can be converted easy to json)
+        Arrays.stream(keyPathArr).forEach((String keyPath)-> keyPathList.add(keyPath.substring(2)));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonKeyPathArray = "[]";
+
+        try {
+            jsonKeyPathArray = objectMapper.writeValueAsString(keyPathList);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace(); // should never happen
+        }
+
+        return jsonKeyPathArray;
+    }
+
+
 
 
 

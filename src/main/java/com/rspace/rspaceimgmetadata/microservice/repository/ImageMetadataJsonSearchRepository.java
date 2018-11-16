@@ -113,4 +113,18 @@ public interface ImageMetadataJsonSearchRepository extends JpaRepository<ImageMe
             ") as all_keys;"
             , nativeQuery = true)
     String[] extractAllTopLevelKeys();
+
+
+    @Query(value =
+            "select distinct keyPaths.* " +
+            "From " +
+            "   image_metadata i," +
+            "   JSON_TABLE(" +
+            "     JSON_MERGE(" +
+            "       '[]', " +
+            "       JSON_SEARCH(i.metadata,'all','%')" +
+            "     ), " +
+            "     \"$[*]\" COLUMNS(key_path varchar(255) PATH '$')" +
+            "   ) as keyPaths;", nativeQuery = true)
+    String [] extractAllKeyPaths();
 }
