@@ -343,6 +343,27 @@ public class ImgMetaDataSearchTest {
         assertThat("Tried not search term that exists only for other user", bodyTest4, is("[]"));
     }
 
+    @Test
+    public void extractTopLevelKeysTest(){
+        String testUrl = "/img_metadata/topKeys";
+
+        ResponseEntity<String> testResponse = restTemplate.getForEntity(testUrl, String.class);
+
+        assertThat(HttpStatus.OK, is(testResponse.getStatusCode()));
+        assertThat(testResponse.getBody(), containsString("exposurecompensation"));
+        assertThat(testResponse.getBody(), not(containsString("padding[0]")));
+    }
+
+    @Test
+    public void extractAllKeyPathsTest(){
+        String testUrl = "/img_metadata/allKeys";
+
+        ResponseEntity<String> testResponse = restTemplate.getForEntity(testUrl, String.class);
+
+        assertThat(HttpStatus.OK, is(testResponse.getStatusCode()));
+        assertThat(testResponse.getBody(), containsString("padding[0]"));
+    }
+
 
     private String performSearchTestWithParameter(String searchTerm, String jsonParameter, String url){
         HttpHeaders headers = new HttpHeaders();

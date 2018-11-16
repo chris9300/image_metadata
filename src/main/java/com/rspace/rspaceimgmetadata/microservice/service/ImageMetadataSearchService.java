@@ -2,6 +2,7 @@ package com.rspace.rspaceimgmetadata.microservice.service;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,6 +16,7 @@ import javax.swing.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @Service
 public class ImageMetadataSearchService {
@@ -136,6 +138,53 @@ public class ImageMetadataSearchService {
     public String searchPrefixInAllKeysOfUsers(String searchPrefix, String jsonUsers){
         return searchTermInAllKeysOfUsers(searchPrefix + "%", jsonUsers);
     }
+
+
+    /**
+     * Extracts all existing top lvl keys of the metadata column in the database and returns them as json array
+     * @return json array with all top lvl keys
+     */
+    public String extractAllTopLevelKeys(){
+        ObjectMapper mapper = new ObjectMapper();
+        ArrayList topLvlKeys = new ArrayList<String>(Arrays.asList(searchRepository.extractAllTopLevelKeys()));
+
+        String jsonKeyArray = "";
+
+        try {
+            jsonKeyArray = mapper.writeValueAsString(topLvlKeys);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+
+        return jsonKeyArray;
+    }
+
+    /**
+     * Extracts all key paths from the database. The key lvls are separated by dots. The returned key paths don't contain
+     * the $. prefix. So they can directly used for the search.
+     * @return Json array of all key paths
+     */
+    public String extractAllKeys(){
+        // Get keyPath from the database. MySql returns keyPath with a $. prefix
+        String[] keyPathArr = searchRepository.extractAllKeyPaths();
+        ArrayList<String> keyPathList = new ArrayList<String>();
+
+        // Remove .$ prefix and create ArrayList (which can be converted easy to json)
+        Arrays.stream(keyPathArr).forEach((String keyPath)-> keyPathList.add(keyPath.substring(2)));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonKeyPathArray = "[]";
+
+        try {
+            jsonKeyPathArray = objectMapper.writeValueAsString(keyPathList);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace(); // should never happen
+        }
+
+        return jsonKeyPathArray;
+    }
+
+
 
 
 

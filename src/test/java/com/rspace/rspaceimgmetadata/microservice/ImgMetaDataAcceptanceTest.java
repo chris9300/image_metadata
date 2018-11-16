@@ -28,8 +28,8 @@ public class ImgMetaDataAcceptanceTest {
 
 	@Test
 	public void statusTest() {
-		String body = this.restTemplate.getForObject("/status", String.class);
-		assertEquals("OK",body);
+		ResponseEntity<String> responseEntity = this.restTemplate.getForEntity("/status", String.class);
+		assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
 	}
 
 	/**
@@ -265,8 +265,6 @@ public class ImgMetaDataAcceptanceTest {
 
 	/*
 	Todo Testcases:
-	Application Tests:
-	- Update metadata
 
 	ComponentTests:
 	Convert Metadata to hash map
