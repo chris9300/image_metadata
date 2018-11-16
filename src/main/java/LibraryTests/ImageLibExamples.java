@@ -6,6 +6,7 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.imaging.*;
+import org.apache.commons.imaging.common.IImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata;
 import org.apache.commons.imaging.formats.jpeg.JpegImageMetadata;
 import org.apache.commons.imaging.formats.tiff.TiffField;
@@ -51,7 +52,7 @@ public class ImageLibExamples {
 			byte[] imageBytes = baos.toByteArray();
 			*/
 			
-			ImageMetadata metadata = Imaging.getMetadata(imgFile);
+			IImageMetadata metadata = Imaging.getMetadata(imgFile);
 
 			if (metadata != null) {
 				/*if (metadata instanceof JpegImageMetadata) {
