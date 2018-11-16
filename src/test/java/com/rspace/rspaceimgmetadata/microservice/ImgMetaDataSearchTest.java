@@ -78,7 +78,6 @@ public class ImgMetaDataSearchTest {
         String testUrl = "/img_metadata/search/inKeys/";
         String jsonKeySet = "[\"City\"]";
         String searchTerm1 = "City (Core) (ref2017.1)";
-        //String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
 
         String testBody1 = performSearchTestWithParameter(searchTerm1, jsonKeySet, testUrl);
 
@@ -94,9 +93,8 @@ public class ImgMetaDataSearchTest {
         // Use several keys in the json key array
         String jsonKeySet2 = "[\"Model\", \"City\"]";
         String searchTerm2 = "City (Core) (ref2017.1)";
-        //String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
 
-        String testBody2 = performSearchTestWithParameter(searchTerm1, jsonKeySet, testUrl);
+        String testBody2 = performSearchTestWithParameter(searchTerm2, jsonKeySet2, testUrl);
 
         //Should be the only answer image:
         assertThat(testBody2, containsString("City (Core) (ref2017.1)"));
