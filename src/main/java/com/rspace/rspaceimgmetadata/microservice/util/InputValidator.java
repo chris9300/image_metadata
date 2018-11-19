@@ -1,9 +1,9 @@
-package com.rspace.rspaceimgmetadata.microservice.Util;
+package com.rspace.rspaceimgmetadata.microservice.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
-import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
+import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEmbeddedKey;
+import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;

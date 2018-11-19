@@ -3,6 +3,8 @@ package com.rspace.rspaceimgmetadata.microservice.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CouldNotParseCZIMetadataException;
+import com.rspace.rspaceimgmetadata.microservice.util.excpetions.MetadataSegmentNotFoundException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -10,7 +12,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-import static com.rspace.rspaceimgmetadata.microservice.service.CziFile.SEGMENTID_METADATA;
+import static com.rspace.rspaceimgmetadata.microservice.service.CziFile.SEGMENT_ID_METADATA;
 
 /**
  * Provides functionalities to (extract and) parse the metadata of CziFiles to json or xml
@@ -69,7 +71,7 @@ public class CziMetadataParser {
 
         } catch (IOException e) {
             e.printStackTrace();
-            throw new CouldNotParseCZIMetadataException("An error ocurred by parsing the extracted xml to json. Perhaps the extracted xml is not valid");
+            throw new CouldNotParseCZIMetadataException("An error ocurred by parsing the extracted xml to json. Perhaps the extracted xml is not valid", e);
         }
     }
 
@@ -88,7 +90,7 @@ public class CziMetadataParser {
 
         //check if this is really the start of the metadata section:
         if(!checkMetadataPosition(metadataPosition)){
-            throw new MetadataSegmentNotFoundException("No metadata segment was found. Searched on byte 92. Perhaps the czi file is corrupted");
+            throw new MetadataSegmentNotFoundException("No metadata segment was found. Searched on byte 92. Perhaps the czi file is corrupted", null);
         }
 
         // Regarding the filetype doc, the xmlSize is a int, starting at the 16th byte of the metadata segment header
@@ -119,7 +121,7 @@ public class CziMetadataParser {
             e.printStackTrace();
             return false;
         }
-        return segmentID.contains(SEGMENTID_METADATA);
+        return segmentID.contains(SEGMENT_ID_METADATA);
     }
 
     /**
@@ -138,20 +140,12 @@ public class CziMetadataParser {
         return jsonMetadata;
     }
 
+    /**
+     * Returns the extracted metadata as json String that only contains lower case letters
+     * @return
+     */
     private String getJsonMetadataAsLowerCase(){
         return jsonMetadata.toLowerCase();
     }
 
-    //todo higher lvl parsing exception
-    public class MetadataSegmentNotFoundException extends CouldNotParseCZIMetadataException{
-        public MetadataSegmentNotFoundException(String message) {
-            super(message);
-        }
-    }
-
-    public class CouldNotParseCZIMetadataException extends Exception{
-        public CouldNotParseCZIMetadataException(String message) {
-            super(message);
-        }
-    }
 }

@@ -1,11 +1,14 @@
 package com.rspace.rspaceimgmetadata.microservice.service;
 
+import com.rspace.rspaceimgmetadata.microservice.util.excpetions.NoValidCziFileException;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.*;
 import java.util.Arrays;
 
 public class CziFile {
-    final static String SEGMENTID_FILE = "ZISRAWFILE";
-    final static String SEGMENTID_METADATA = "ZISRAWMETADATA";
+    final static String SEGMENT_ID_FILE = "ZISRAWFILE";
+    final static String SEGMENT_ID_METADATA = "ZISRAWMETADATA";
 
     byte[] fileBytes;
 
@@ -19,11 +22,20 @@ public class CziFile {
     }
 
     /**
+     * Creates a new CziFile from an inputStream
+     * @param file Multipart czi file
+     * @throws NoValidCziFileException
+     */
+    public CziFile(MultipartFile file) throws NoValidCziFileException {
+        readMultipartFile(file);
+    }
+
+    /**
      * Creates a new CzuFile from a file on the disk (in the classpath)
      * @param filename
      * @throws NoValidCziFileException
      */
-    public CziFile(String filename) throws NoValidCziFileException {
+    public CziFile(String filename) throws NoValidCziFileException, FileNotFoundException {
         File file = new File(filename);
         readFile(file);
     }
@@ -33,7 +45,7 @@ public class CziFile {
      * @param file
      * @throws NoValidCziFileException
      */
-    public CziFile(File file) throws NoValidCziFileException {
+    public CziFile(File file) throws NoValidCziFileException, FileNotFoundException {
         readFile(file);
     }
 
@@ -57,28 +69,36 @@ public class CziFile {
                 fileBytes = null;
 
                 throw new NoValidCziFileException("Could not found the header of the szi file. Perhaps wrong file format " +
-                        "or corrupted file used");
+                        "or corrupted file used", null);
             }
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new NoValidCziFileException("Could not read the input File. Perhaps the file is corrupted.", e);
         }
     }
 
     /**
-     * reads file and returns the inputStream
+     * Read a czi data from a file object. Check if it is valid czi and store the bytes in the CziFile
      * @param file
      */
-    private void readFile(File file) throws NoValidCziFileException {
-        InputStream inStream = null;
-
-        try{
-            inStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
+    private void readFile(File file) throws NoValidCziFileException, FileNotFoundException {
+        InputStream inStream = new FileInputStream(file);
         readInputStream(inStream);
+    }
+
+    /**
+     * Read a czi data from a MultipartFile object. Check if it is valid czi and store the bytes in the CziFile
+     * @param file
+     */
+    private void readMultipartFile(MultipartFile file) throws NoValidCziFileException {
+        try {
+            InputStream inputStream = file.getInputStream();
+            readInputStream(inputStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new NoValidCziFileException("Could not read the input File. Perhaps the file is corrupted.", e);
+        }
     }
 
     /**
@@ -94,15 +114,13 @@ public class CziFile {
             return false;
         }
 
-        return segmentID.contains(SEGMENTID_FILE);
+        return segmentID.contains(SEGMENT_ID_FILE);
     }
 
-    public class NoValidCziFileException extends Exception{
-        public NoValidCziFileException(String message) {
-            super(message);
-        }
-    }
-
+    /**
+     * Returns the byte array of the czi file
+     * @return
+     */
     public byte[] getFileBytes() {
         return fileBytes;
     }

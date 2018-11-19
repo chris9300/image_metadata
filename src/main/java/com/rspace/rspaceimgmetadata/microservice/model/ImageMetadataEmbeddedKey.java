@@ -1,9 +1,8 @@
-package com.rspace.rspaceimgmetadata.microservice.Model;
+package com.rspace.rspaceimgmetadata.microservice.model;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.validation.constraints.Digits;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.io.Serializable;

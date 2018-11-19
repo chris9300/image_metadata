@@ -1,4 +1,4 @@
-package com.rspace.rspaceimgmetadata.microservice.Model;
+package com.rspace.rspaceimgmetadata.microservice.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

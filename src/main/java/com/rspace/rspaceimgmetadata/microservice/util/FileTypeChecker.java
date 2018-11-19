@@ -1,13 +1,16 @@
-package com.rspace.rspaceimgmetadata.microservice.Util;
+package com.rspace.rspaceimgmetadata.microservice.util;
 
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
 
 public class FileTypeChecker {
+    final static String CZI_EXTENSION = "czi";
+
+
     final static String[] VALID_STANDARD_FILE_TYPES = {"image/jpg", "image/jpeg", "image/png", "image/tif", "image/tiff"};
     final static String[] VALID_PROPRIETARY_FILE_TYPES = {"application/octet-stream"};
-    final static String[] VALID_PROPRIETARY_FILE_EXTENSION = {"czi"};
+    final static String[] VALID_PROPRIETARY_FILE_EXTENSION = {CZI_EXTENSION};
 
     /**
      * Check if the file is a supported standard filetype:
@@ -37,6 +40,23 @@ public class FileTypeChecker {
             // If valid filetype, check file extension
             String fileExtension = getFileExtension(file);
             return Arrays.asList(VALID_PROPRIETARY_FILE_EXTENSION).contains(fileExtension);
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Checks if a file is a czi (carl zeiss image) file
+     * @param file
+     * @return
+     */
+    public static boolean isCziFile(MultipartFile file){
+        // First check the filetype
+        if(Arrays.asList(VALID_PROPRIETARY_FILE_TYPES).contains(file.getContentType())) {
+
+            // If valid filetype, check that the extension is czi
+            String fileExtension = getFileExtension(file);
+            return fileExtension.equals(CZI_EXTENSION);
         } else {
             return false;
         }

@@ -1,6 +1,6 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
-import com.rspace.rspaceimgmetadata.microservice.Util.InputValidator;
+import com.rspace.rspaceimgmetadata.microservice.util.InputValidator;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
