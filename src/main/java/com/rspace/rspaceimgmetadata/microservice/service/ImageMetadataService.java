@@ -96,6 +96,11 @@ public class ImageMetadataService {
         }
     }
 
+    /**
+     * Deletes a image dataset in the database
+     * @param imageKey
+     * @throws NoDatabaseEntryFoundException
+     */
     public void deleteImageMetadata(ImageMetadataEmbeddedKey imageKey) throws NoDatabaseEntryFoundException {
         try {
             metadataRepository.deleteById(imageKey);
@@ -125,6 +130,12 @@ public class ImageMetadataService {
             }
     }
 
+    /**
+     * Extracts the metadata of a proprietary file (as MultipartFile Object)(e.g. czi-file) and return them as json String
+     * @param propImgFile
+     * @return
+     * @throws WrongOrCorruptFileException
+     */
     private String jsonMetadataFromProprietaryFile(MultipartFile propImgFile) throws WrongOrCorruptFileException {
         if(FileTypeChecker.isCziFile(propImgFile)){
             try {
@@ -138,6 +149,13 @@ public class ImageMetadataService {
         throw new WrongOrCorruptFileException("Not valid file format detected. Perhaps the file format is not supported. Or the czi file is corrupted", null);
     }
 
+    /**
+     * Extracts metadata from files and returns them as json String.
+     * Handles different datafiles containing standard image formats and proprietary formats like czi-files
+     * @param file
+     * @return
+     * @throws WrongOrCorruptFileException
+     */
     private String extractJsonMetadataFromFile(MultipartFile file) throws WrongOrCorruptFileException {
         if (FileTypeChecker.isSupportedStandardFile(file)){
             return jsonMetadataFromStandardFile(file);
