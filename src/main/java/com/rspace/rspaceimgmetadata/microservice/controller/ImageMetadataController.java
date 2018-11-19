@@ -1,6 +1,7 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
 import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
+import com.rspace.rspaceimgmetadata.microservice.Util.InputValidator;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.DuplicateEntryException;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.WrongFileFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,6 @@ public class ImageMetadataController {
         if(!validator.isValid()){
             return validator.getLastErrorResponse().get();
         }
-
         try {
             imageMetadataService.insertNewImageMetadata(inputData, imgFile);
         } catch (WrongFileFormatException e){
@@ -52,7 +52,6 @@ public class ImageMetadataController {
         } catch (DuplicateEntryException e){
             return  new ResponseEntity<String>("Image metadata with the same ID are already in the database", HttpStatus.CONFLICT);
         }
-
         return new ResponseEntity<String>("Created", HttpStatus.NO_CONTENT);
     }
 

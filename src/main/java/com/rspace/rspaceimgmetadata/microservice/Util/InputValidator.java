@@ -1,4 +1,4 @@
-package com.rspace.rspaceimgmetadata.microservice.controller;
+package com.rspace.rspaceimgmetadata.microservice.Util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,9 +22,7 @@ import java.util.*;
  * The errors are ResponseEntity Object because it is assumed that the input parameters are received via the http-interface.
  */
 public class InputValidator {
-    final static String[] validFileTypes = {"image/jpg", "image/jpeg", "image/png", "image/tif", "image/tiff"};
     ValidatorFactory factory;
-
 
     boolean valid = true;
     ResponseEntity<String> lastHtmlErrorResponse;
@@ -185,21 +183,46 @@ public class InputValidator {
     }
 
     /**
-     * Adds a file and check if the file is valid. Valid files have to be one of these filetypes:
+     * Adds a file and check if the file is valid. (Does not check the file content)
+     * Valid standard files have to be one of these filetypes:
      * - image/jpg
      * - image/jpeg
      * - image/png
      * - image/tif
      * - image/tiff
      *
+     * Valid proprietary files have to have one of these extension:
+     * - czi
+     *
      * If the file is not valid, the isValid variable gets false and an error message will be stored.
      * @param file
      */
     public void addFile(MultipartFile file){
-        if(!Arrays.asList(validFileTypes).contains(file.getContentType())){
+        // Check if file is supported
+        if(!checkFile(file)){
             addNewError(new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
         }
     }
+
+    /**
+     * Checks if the file is a supported standard or proprietary file
+     * @param file
+     * @return true if the file is supported
+     */
+    private boolean checkFile(MultipartFile file){
+        // Check if standardFile
+        if(FileTypeChecker.isSupportedStandardFile(file)){
+            return true;
+        }
+        // Check if proprietary File
+        if(FileTypeChecker.isSupportedProprietaryFile(file)){
+            // Check if this kind of propietary file is allowed
+            return true;
+        }
+        return false;
+    }
+
+
 
     public boolean isValid(){
         return valid;
