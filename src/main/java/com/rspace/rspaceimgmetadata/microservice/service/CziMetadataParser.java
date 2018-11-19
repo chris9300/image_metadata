@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CouldNotParseCZIMetadataException;
-import com.rspace.rspaceimgmetadata.microservice.util.excpetions.MetadataSegmentNotFoundException;
+import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CziMetadataSegmentNotFoundException;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -78,9 +78,9 @@ public class CziMetadataParser {
     /**
      * Extracts the metadata from the bytes of the czi files. See the czi documentation for positions in the byte array.
      * (Consider that numbers are stored as little endian)
-     * @throws MetadataSegmentNotFoundException
+     * @throws CziMetadataSegmentNotFoundException
      */
-    private void extractXmlMetadata() throws MetadataSegmentNotFoundException {
+    private void extractXmlMetadata() throws CziMetadataSegmentNotFoundException {
 
         byte[] fileBytes = cziFile.getFileBytes();
 
@@ -90,7 +90,7 @@ public class CziMetadataParser {
 
         //check if this is really the start of the metadata section:
         if(!checkMetadataPosition(metadataPosition)){
-            throw new MetadataSegmentNotFoundException("No metadata segment was found. Searched on byte 92. Perhaps the czi file is corrupted", null);
+            throw new CziMetadataSegmentNotFoundException("No metadata segment was found. Searched on byte 92. Perhaps the czi file is corrupted", null);
         }
 
         // Regarding the filetype doc, the xmlSize is a int, starting at the 16th byte of the metadata segment header

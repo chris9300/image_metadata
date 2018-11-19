@@ -104,28 +104,6 @@ public class ImageMetadataService {
         }
     }
 
-    /**
-     * Extractes the metadata from the imgFile and added the extracted metadata as json to the imageMetadata Data Object
-     * @param imageMetadataDO ImageMetadata Data Object
-     * @param imgFile Image File
-     * @return
-     * @throws WrongOrCorruptFileException Thrown if the Metadata can not be extracted from the image file (Assumes, that the format is wrong)
-     */
-    @Deprecated
-    private ImageMetadataEntity addMetadataToEntityObject(ImageMetadataEntity imageMetadataDO, MultipartFile imgFile)
-            throws WrongOrCorruptFileException {
-        try {
-            IImageMetadata metadata = Imaging.getMetadata(imgFile.getInputStream(), imgFile.getName());
-            String jsonMetadata = ImageMetadataParser.parseToJson(metadata);
-
-            imageMetadataDO.setJsonMetadata(jsonMetadata);
-        } catch (ImageReadException | IOException e) {
-            // This should only thrown if the data is from the wrong file format
-            throw new WrongOrCorruptFileException("", e);
-        }
-
-        return imageMetadataDO;
-    }
 
     /**
      * Extracts the metadata from a standard image file (see FileTypeChecker) and returns them as json String
