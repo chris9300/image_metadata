@@ -21,7 +21,7 @@ public class FileTypeChecker {
      * - image/tiff
      *
      * @param file
-     * @return true if supported standarf file type
+     * @return true if supported standard file type
      */
     public static boolean isSupportedStandardFile(MultipartFile file){
         return Arrays.asList(VALID_STANDARD_FILE_TYPES).contains(file.getContentType());
