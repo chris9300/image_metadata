@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEmbeddedKey;
 import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEntity;
+import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -214,9 +215,14 @@ public class InputValidator {
         if(FileTypeChecker.isSupportedStandardFile(file)){
             return true;
         }
-        // Check if proprietary File
+        // Check if allowed proprietary file
         if(FileTypeChecker.isSupportedProprietaryFile(file)){
-            // Check if this kind of propietary file is allowed
+            if(file.getSize() > Integer.MAX_VALUE){
+                // Check that the file size is not bigger than about 250 bytes. This is because the max size of byte arrays
+                addNewError(new ResponseEntity<String>(
+                        "The file is to large for the service. CZI Files are supported to a max of " + Integer.MAX_VALUE + " bytes",
+                        HttpStatus.UNSUPPORTED_MEDIA_TYPE));
+            }
             return true;
         }
         return false;
