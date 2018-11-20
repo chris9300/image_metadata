@@ -1,5 +1,11 @@
 package com.rspace.rspaceimgmetadata.microservice.service;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonTokenId;
+import com.fasterxml.jackson.core.io.IOContext;
+import com.fasterxml.jackson.core.util.JsonParserDelegate;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -7,10 +13,13 @@ import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CouldNotParseCZ
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CziMetadataSegmentNotFoundException;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
+import java.util.Map;
 
 import static com.rspace.rspaceimgmetadata.microservice.service.CziFile.SEGMENT_ID_METADATA;
 
@@ -39,8 +48,18 @@ public class CziMetadataParser {
         parser.extractXmlMetadata();
         parser.createJsonMetadata();
 
+        return parser.getJsonMetadata();
+    }
+
+    public static String toJsonWithLowerKeys(CziFile cziFile) throws CouldNotParseCZIMetadataException{
+        CziMetadataParser parser = new CziMetadataParser(cziFile);
+        parser.extractXmlMetadata();
+        parser.createJsonMetadata();
+
         return parser.getJsonMetadataAsLowerCase();
     }
+
+
 
     /**
      * Returns the metadata of the czi file as xml String
@@ -144,8 +163,76 @@ public class CziMetadataParser {
      * Returns the extracted metadata as json String that only contains lower case letters
      * @return
      */
-    private String getJsonMetadataAsLowerCase(){
-        return jsonMetadata.toLowerCase();
+    private String getJsonMetadataAsLowerCase() throws CouldNotParseCZIMetadataException {
+        try {
+            return lowerParser();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CouldNotParseCZIMetadataException("Could not parse the normal json String to json String with lower cases", e);
+        }
+    }
+
+
+    //////////////////////////////// copied form:
+    // https://stackoverflow.com/questions/18838095/how-do-i-parse-json-into-a-map-with-lowercase-keys-using-jackson
+    ///////////////////////////////
+    private String lowerParser() throws IOException {
+        @SuppressWarnings("serial")
+        ObjectMapper mapper = new ObjectMapper(new JsonFactory() {
+            @Override
+            protected JsonParser _createParser(byte[] data, int offset, int len, IOContext ctxt) throws IOException {
+                return new DowncasingParser(super._createParser(data, offset, len, ctxt));
+            }
+
+            @Override
+            protected JsonParser _createParser(InputStream in, IOContext ctxt) throws IOException {
+                return new DowncasingParser(super._createParser(in, ctxt));
+            }
+
+            @Override
+            protected JsonParser _createParser(Reader r, IOContext ctxt) throws IOException {
+                return new DowncasingParser(super._createParser(r, ctxt));
+            }
+
+            @Override
+            protected JsonParser _createParser(char[] data, int offset, int len, IOContext ctxt, boolean recyclable)
+                    throws IOException {
+                return new DowncasingParser(super._createParser(data, offset, len, ctxt, recyclable));
+            }
+        });
+
+        Map<String, ?> val = mapper.reader(Map.class)
+                .with(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+                .with(JsonParser.Feature.ALLOW_SINGLE_QUOTES)
+                .readValue(jsonMetadata);//readValue("{CustName:'Jimmy Smith', CustNo:'1234', Details:{PhoneNumber:'555-5555',Result:'foo'} } }");
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(val);
+
+    }
+
+
+    private static final class DowncasingParser extends JsonParserDelegate {
+        private DowncasingParser(JsonParser d) {
+            super(d);
+        }
+
+        @Override
+        public String getCurrentName() throws IOException, JsonParseException {
+            if (hasTokenId(JsonTokenId.ID_FIELD_NAME)) {
+                return delegate.getCurrentName().toLowerCase();
+            }
+            return delegate.getCurrentName();
+        }
+
+        @Override
+        public String getText() throws IOException, JsonParseException {
+            if (hasTokenId(JsonTokenId.ID_FIELD_NAME)) {
+                return delegate.getText().toLowerCase();
+            }
+            return delegate.getText();
+        }
     }
 
 }

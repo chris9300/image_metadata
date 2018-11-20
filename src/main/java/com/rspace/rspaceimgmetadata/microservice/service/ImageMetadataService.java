@@ -140,7 +140,7 @@ public class ImageMetadataService {
         if(FileTypeChecker.isCziFile(propImgFile)){
             try {
                 CziFile cziFile = new CziFile(propImgFile);
-                return CziMetadataParser.toJson(cziFile);
+                return CziMetadataParser.toJsonWithLowerKeys(cziFile);
             } catch (NoValidCziFileException e) {
                 e.printStackTrace();
                 throw new WrongOrCorruptFileException("Could not extract the metadata. Probably the file is corrupted or perhaps the file has the wrong file format", e);
