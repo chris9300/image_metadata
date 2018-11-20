@@ -78,7 +78,6 @@ public class ImgMetaDataSearchTest {
         String testUrl = "/img_metadata/search/inKeys/";
         String jsonKeySet = "[\"City\"]";
         String searchTerm1 = "City (Core) (ref2017.1)";
-        //String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
 
         String testBody1 = performSearchTestWithParameter(searchTerm1, jsonKeySet, testUrl);
 
@@ -92,11 +91,10 @@ public class ImgMetaDataSearchTest {
         assertThat(testBody1,not(containsString("cust_test_4")));
 
         // Use several keys in the json key array
-        String jsonKeySet2 = "[\"Model\", \"City\"]";
+        String jsonKeySet2 = "[\"model\", \"City\"]";
         String searchTerm2 = "City (Core) (ref2017.1)";
-        //String expectedJson = "{\"id\": null, \"metadata\": [{\"$.ColorSpace\": \"1\"}], \"customer_id\": \"cust847\", \"image_version\": 2, \"rspace_image_id\": 10043}";
 
-        String testBody2 = performSearchTestWithParameter(searchTerm1, jsonKeySet, testUrl);
+        String testBody2 = performSearchTestWithParameter(searchTerm2, jsonKeySet2, testUrl);
 
         //Should be the only answer image:
         assertThat(testBody2, containsString("City (Core) (ref2017.1)"));
@@ -173,7 +171,7 @@ public class ImgMetaDataSearchTest {
     @Test
     public void searchTermInKeysOfUsersTest(){
         String testUrl = "/img_metadata/search/inKeys/ofUsers/";
-        String jsonParameter1 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_3\"]}";
+        String jsonParameter1 = "{\"keys\":[\"model\"], \"users\":[\"uid_test_3\"]}";
         String searchTerm1 = "EVA-L09";
 
         String bodyTest1 = performSearchTestWithParameter(searchTerm1, jsonParameter1, testUrl);
@@ -188,7 +186,7 @@ public class ImgMetaDataSearchTest {
 
         /// Check if images get returned if the search term exists for another user
 
-        String jsonParameter2 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_2\"]}";
+        String jsonParameter2 = "{\"keys\":[\"model\"], \"users\":[\"uid_test_2\"]}";
         String searchTerm2 = "EVA-L09";
 
         String bodyTest2 = performSearchTestWithParameter(searchTerm2, jsonParameter2, testUrl);
@@ -205,7 +203,7 @@ public class ImgMetaDataSearchTest {
         assertThat( bodyTest3, is("[]"));
 
         // Check prefix
-        String jsonParameter4 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_3\"]}";
+        String jsonParameter4 = "{\"keys\":[\"model\"], \"users\":[\"uid_test_3\"]}";
         String searchTerm4 = "EVA";
 
         String bodyTest4 = performSearchTestWithParameter(searchTerm4, jsonParameter4, testUrl);
@@ -302,7 +300,7 @@ public class ImgMetaDataSearchTest {
     @Test
     public void searchPrefixInKeysOfUsersTest(){
         String testUrl = "/img_metadata/search/prefix/inKeys/ofUsers/";
-        String jsonParameter1 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_3\"]}";
+        String jsonParameter1 = "{\"keys\":[\"model\"], \"users\":[\"uid_test_3\"]}";
         String searchTerm1 = "EVA";
 
         String bodyTest1 = performSearchTestWithParameter(searchTerm1, jsonParameter1, testUrl);
@@ -316,7 +314,7 @@ public class ImgMetaDataSearchTest {
 
 
         /// Check if images get returned if an empty (not existing) user is set
-        String jsonParameter2 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_empty\"]}";
+        String jsonParameter2 = "{\"keys\":[\"model\"], \"users\":[\"uid_test_empty\"]}";
         String searchTerm2 = "EVA";
 
         String bodyTest2 = performSearchTestWithParameter(searchTerm2, jsonParameter2, testUrl);
@@ -326,7 +324,7 @@ public class ImgMetaDataSearchTest {
 
         /// Check if images get returned if the search term exists for another user
 
-        String jsonParameter3 = "{\"keys\":[\"Model\"], \"users\":[\"uid_test_2\"]}";
+        String jsonParameter3 = "{\"keys\":[\"model\"], \"users\":[\"uid_test_2\"]}";
         String searchTerm3 = "EVA";
 
         String bodyTest3 = performSearchTestWithParameter(searchTerm3, jsonParameter3, testUrl);

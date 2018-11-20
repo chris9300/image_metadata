@@ -94,12 +94,27 @@ public class ImgMetaDataAcceptanceTest {
 
 		assertThat("Tries to check if data is really in DB. Error may be an get error", checkAfterTestTIF, containsString("cust_test_tif"));
 
+		// ** CZI Test ** //
 
-		// ** Try to insert an already existing image (key) ** //
+		String filenameTestCZI = "czi_test.czi";
+		String imageKeyParsCZI = "/cust_test_czi/uid_test/1000/1";
+		HttpStatus CziTestResponse = performHTTPTestWithFile(testUrl + imageKeyParsCZI, filenameTestCZI, httpMethod);
+
+		// Check if data is really in database
+		String checkAfterTestCZI = restTemplate.getForObject( "/img_metadata/get/cust_test_czi/1000/1", String.class);
+
+		// Expect HTTP NO_CONTENT because insert operation does not response content.
+		assertThat(CziTestResponse, is(HttpStatus.NO_CONTENT));
+
+		assertThat("Tries to check if data is really in DB. Error may be an get error", checkAfterTestCZI, containsString("cust_test_czi"));
+
+
+
+		// ** Duplicate Test: Try to insert an already existing image (key) ** //
 
 		String imageKeyParsDuplicate = "/cust_test_duplicate/uid_test/1000/1";
-		HttpStatus DuplicateTestResponse1 = performHTTPTestWithFile(testUrl + imageKeyParsDuplicate, filenameTestTIF, httpMethod);
-		HttpStatus DuplicateTestResponse2 = performHTTPTestWithFile(testUrl + imageKeyParsDuplicate, filenameTestTIF, httpMethod);
+		HttpStatus DuplicateTestResponse1 = performHTTPTestWithFile(testUrl + imageKeyParsDuplicate, filenameTestCZI, httpMethod);
+		HttpStatus DuplicateTestResponse2 = performHTTPTestWithFile(testUrl + imageKeyParsDuplicate, filenameTestCZI, httpMethod);
 
 		// Expect HTTP NO_CONTENT for the first and HTTP CONFLICT for the second insert
 		assertThat(DuplicateTestResponse1, is(HttpStatus.NO_CONTENT));

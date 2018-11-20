@@ -1,8 +1,10 @@
 package com.rspace.rspaceimgmetadata.microservice.controller;
 
-import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEmbeddedKey;
-import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.DuplicateEntryException;
-import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService.WrongFileFormatException;
+import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEmbeddedKey;
+import com.rspace.rspaceimgmetadata.microservice.util.InputValidator;
+import com.rspace.rspaceimgmetadata.microservice.util.excpetions.DuplicateEntryException;
+import com.rspace.rspaceimgmetadata.microservice.util.excpetions.WrongOrCorruptFileException;
+import com.rspace.rspaceimgmetadata.microservice.util.excpetions.NoDatabaseEntryFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.rspace.rspaceimgmetadata.microservice.Model.ImageMetadataEntity;
+import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEntity;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataService;
 
 import java.util.Optional;
@@ -44,15 +46,13 @@ public class ImageMetadataController {
         if(!validator.isValid()){
             return validator.getLastErrorResponse().get();
         }
-
         try {
             imageMetadataService.insertNewImageMetadata(inputData, imgFile);
-        } catch (WrongFileFormatException e){
+        } catch (WrongOrCorruptFileException e){
              return new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         } catch (DuplicateEntryException e){
             return  new ResponseEntity<String>("Image metadata with the same ID are already in the database", HttpStatus.CONFLICT);
         }
-
         return new ResponseEntity<String>("Created", HttpStatus.NO_CONTENT);
     }
 
@@ -78,7 +78,7 @@ public class ImageMetadataController {
 
         try{
         imageMetadataService.updateImageMetadata(inputData, imgFile);
-        } catch (WrongFileFormatException e){
+        } catch (WrongOrCorruptFileException e){
             return new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE);
         }
 
@@ -103,7 +103,7 @@ public class ImageMetadataController {
             return validator.getLastErrorResponse().get();
         }
 
-        Optional<String> jsonResponseBody = imageMetadataService.getImageMetadata(customerId, rspaceImageId, version);
+        Optional<String> jsonResponseBody = imageMetadataService.getImageData(customerId, rspaceImageId, version);
 
         return createJsonHttpGetResponse(jsonResponseBody);
     }
@@ -129,7 +129,7 @@ public class ImageMetadataController {
         try {
             imageMetadataService.deleteImageMetadata(imageKey);
             return new ResponseEntity<String>("Deleted", HttpStatus.OK);
-        } catch (ImageMetadataService.NoDatabaseEntryFoundException e) {
+        } catch (NoDatabaseEntryFoundException e) {
             return new ResponseEntity<String>("Could not delete!", HttpStatus.NOT_FOUND);
         }
     }
