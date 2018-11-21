@@ -2,9 +2,12 @@ package com.rspace.rspaceimgmetadata.microservice.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rspace.rspaceimgmetadata.microservice.controller.ImageMetadataController;
 import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEmbeddedKey;
 import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEntity;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +27,7 @@ import java.util.*;
  */
 public class InputValidator {
     ValidatorFactory factory;
+    Logger logger;
 
     boolean valid = true;
     ResponseEntity<String> lastHtmlErrorResponse;
@@ -36,6 +40,7 @@ public class InputValidator {
     }
 
     public InputValidator() {
+        logger = LoggerFactory.getLogger(ImageMetadataController.class);
         factory = Validation.buildDefaultValidatorFactory();
         htmlErrorResponseList = new ArrayList<ResponseEntity<String>>();
     }
@@ -123,9 +128,11 @@ public class InputValidator {
         try {
             JsonNode json = mapper.readTree(jsonKeyArr);
             if(!json.isArray()){
+                logger.warn(jsonKeyArr + " could not interpreded as json Array for the key Array");
                 addNewError(new ResponseEntity<String>("The json \"keys\" array is corrupted (no json array detected)", HttpStatus.UNPROCESSABLE_ENTITY));
             }
         } catch (IOException e) {
+            logger.warn(jsonKeyArr + " could not interpreded as json Array for the key Array");
             addNewError(new ResponseEntity<String>("The json \"keys\" array is corrupted (no valid json detected)", HttpStatus.UNPROCESSABLE_ENTITY));
         }
 
@@ -144,9 +151,11 @@ public class InputValidator {
         try {
             JsonNode json = mapper.readTree(jsonUserIdArr);
             if(!json.isArray()){
-                addNewError(new ResponseEntity<String>("The json \"keys\" array is corrupted (no json array detected)", HttpStatus.UNPROCESSABLE_ENTITY));
+                logger.warn(jsonUserIdArr + " could not interpreded as json Array for the user Array");
+                addNewError(new ResponseEntity<String>("The json \"users\" array is corrupted (no json array detected)", HttpStatus.UNPROCESSABLE_ENTITY));
             }
         } catch (IOException e) {
+            logger.warn(jsonUserIdArr + " could not interpreded as json Array for the user Array");
             addNewError(new ResponseEntity<String>("The json \"users\" array is corrupted (no valid json detected)", HttpStatus.UNPROCESSABLE_ENTITY));
         }
     }
