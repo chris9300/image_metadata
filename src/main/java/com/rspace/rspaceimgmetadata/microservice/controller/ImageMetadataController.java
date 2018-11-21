@@ -5,6 +5,8 @@ import com.rspace.rspaceimgmetadata.microservice.util.InputValidator;
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.DuplicateEntryException;
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.WrongOrCorruptFileException;
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.NoDatabaseEntryFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -21,11 +23,16 @@ import java.util.Optional;
 @RestController
 public class ImageMetadataController {
 
+
+
     @Autowired
     private ImageMetadataService imageMetadataService;
 
+    private Logger logger;
 
     public ImageMetadataController() {
+        logger = LoggerFactory.getLogger(ImageMetadataController.class);
+        logger.info("Controller started");
     }
 
     /**
@@ -38,12 +45,14 @@ public class ImageMetadataController {
      */
     @PutMapping("/img_metadata/insert/{customerId}/{userId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> insert(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
+        logger.info("Received Insert-Request");
         ImageMetadataEntity inputData = new ImageMetadataEntity(customerId, rspaceImageId, version);
         inputData.setUserId(userId);
 
         InputValidator validator = new InputValidator(inputData);
         validator.addFile(imgFile);
         if(!validator.isValid()){
+            logger.info("Invalid input Variables of Html-Request");
             return validator.getLastErrorResponse().get();
         }
         try {
@@ -66,7 +75,7 @@ public class ImageMetadataController {
      */
     @PostMapping("/img_metadata/update/{customerId}/{userId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> update(@PathVariable String customerId, @PathVariable String userId, @PathVariable Long rspaceImageId, @PathVariable int version, @RequestParam("file") MultipartFile imgFile){
-
+        logger.info("Received Update-Request");
         ImageMetadataEntity inputData = new ImageMetadataEntity(customerId, rspaceImageId, version);
         inputData.setUserId(userId);
 
@@ -96,6 +105,7 @@ public class ImageMetadataController {
      */
     @GetMapping("/img_metadata/get/{customerId}/{rspaceImageId}/{version}")
     public ResponseEntity<String> get(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
+        logger.info("Received Get-Request");
         ImageMetadataEmbeddedKey imageKey = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, version);
 
         InputValidator validator = new InputValidator(imageKey);
@@ -119,6 +129,7 @@ public class ImageMetadataController {
      */
     @DeleteMapping("/img_metadata/delete/{customerId}/{rspaceImageId}/{version}")
     private ResponseEntity<String> delete(@PathVariable String customerId, @PathVariable Long rspaceImageId, @PathVariable int version){
+        logger.info("Received Delete-Request");
         ImageMetadataEmbeddedKey imageKey = new ImageMetadataEmbeddedKey(customerId, rspaceImageId, version);
 
         InputValidator validator = new InputValidator(imageKey);
