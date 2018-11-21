@@ -163,7 +163,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/prefix/inKeys/ofUsers/{searchTerm}")
     public ResponseEntity<String> searchPrefixInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
-        logger.info(jsonParameter); //todo as debug
+        logger.info("Received search for Prefix in Users request with the following parameter: " + jsonParameter); //todo as debug
         // Validate json Input
         InputValidator validator = new InputValidator();
         validator.addJsonParameterObject(jsonParameter);
