@@ -2,6 +2,8 @@ package com.rspace.rspaceimgmetadata.microservice.controller;
 
 import com.rspace.rspaceimgmetadata.microservice.util.InputValidator;
 import com.rspace.rspaceimgmetadata.microservice.service.ImageMetadataSearchService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,11 @@ public class ImageMetadataSearchController {
     @Autowired
     private ImageMetadataSearchService searchService;
 
+    Logger logger;
+
+    public ImageMetadataSearchController() {
+        this.logger = LoggerFactory.getLogger(ImageMetadataSearchController.class);
+    }
 
     @GetMapping("/img_metadata/search/{searchTerm}")
     public ResponseEntity<String> searchInAll(@PathVariable String searchTerm){
@@ -156,6 +163,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/prefix/inKeys/ofUsers/{searchTerm}")
     public ResponseEntity<String> searchPrefixInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
+        logger.info(jsonParameter); //todo as debug
         // Validate json Input
         InputValidator validator = new InputValidator();
         validator.addJsonParameterObject(jsonParameter);
