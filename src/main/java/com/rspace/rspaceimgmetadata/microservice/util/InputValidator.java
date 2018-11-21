@@ -40,7 +40,7 @@ public class InputValidator {
     }
 
     public InputValidator() {
-        logger = LoggerFactory.getLogger(ImageMetadataController.class);
+        logger = LoggerFactory.getLogger(InputValidator.class);
         factory = Validation.buildDefaultValidatorFactory();
         htmlErrorResponseList = new ArrayList<ResponseEntity<String>>();
     }
