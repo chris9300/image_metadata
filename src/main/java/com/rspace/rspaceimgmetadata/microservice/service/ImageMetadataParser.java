@@ -45,9 +45,13 @@ public class ImageMetadataParser {
      * @return
      */
     public HashMap<String, Object> toHashmap(IImageMetadata imgMetadata){
+        metadataMap = new HashMap<>();
+        if(imgMetadata == null){
+            return metadataMap;
+        }
+
         List<? extends ImageMetadata.IImageMetadataItem> metadataList = imgMetadata.getItems();
 
-        metadataMap = new HashMap<>();
 
         for (int i = 0; i < metadataList.size(); i++) {
             ImageMetadata.IImageMetadataItem item = metadataList.get(i);
