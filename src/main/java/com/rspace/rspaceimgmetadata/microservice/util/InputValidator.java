@@ -2,10 +2,8 @@ package com.rspace.rspaceimgmetadata.microservice.util;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.rspace.rspaceimgmetadata.microservice.controller.ImageMetadataController;
 import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEmbeddedKey;
 import com.rspace.rspaceimgmetadata.microservice.model.ImageMetadataEntity;
-import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -63,6 +61,7 @@ public class InputValidator {
      * @param inputEntity
      */
     private void validateImageMetadataEntity(ImageMetadataEntity inputEntity){
+        logger.debug("Try to validate metadata entity");
         validateEmbeddedKey(inputEntity.getEmbeddedKey());
         Validator validator = factory.getValidator();
 
@@ -72,6 +71,7 @@ public class InputValidator {
         // handle errors
         if (constraintViolations.size() > 0) {
             for (ConstraintViolation<ImageMetadataEntity> violation : constraintViolations) {
+                logger.debug("Found non-valid url-path value for " + violation.getPropertyPath() + ": " + violation.getMessage());
                 ResponseEntity<String> error = new ResponseEntity<String>(
                         "The url path variable " + violation.getPropertyPath() + " is invalid: " + violation.getMessage(),
                         HttpStatus.BAD_REQUEST);
@@ -89,6 +89,7 @@ public class InputValidator {
      * @param inputKeyEntity
      */
     private void validateEmbeddedKey(ImageMetadataEmbeddedKey inputKeyEntity){
+        logger.debug("Try to validate metadata entity key contains (customer id, rspace image id, version number)");
         Validator validator = factory.getValidator();
 
         // Validate atomic vars of ImageMetadataEmbeddedKeyEntity
@@ -103,6 +104,8 @@ public class InputValidator {
                 // Adds errors to the htmlErrorResponseList
                 addNewError(error);
             }
+        } else {
+            logger.debug("Metadata entity key is valid");
         }
     }
 
@@ -124,6 +127,7 @@ public class InputValidator {
      * @param jsonKeyArr
      */
     public void addJsonKeyArr(String jsonKeyArr){
+        logger.debug("Try to validate " + jsonKeyArr + " as json Key array");
         final ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode json = mapper.readTree(jsonKeyArr);
@@ -147,6 +151,7 @@ public class InputValidator {
      * @param jsonUserIdArr
      */
     public void addJsonUserIdArr(String jsonUserIdArr){
+        logger.debug("Try to validate " + jsonUserIdArr + " as json Key array");
         final ObjectMapper mapper = new ObjectMapper();
         try {
             JsonNode json = mapper.readTree(jsonUserIdArr);
@@ -170,6 +175,7 @@ public class InputValidator {
      * @param jsonParameterObject
      */
     public void addJsonParameterObject(String jsonParameterObject){
+        logger.debug("Try to validate " + jsonParameterObject + " as json Key array (should contain keys and users array)");
         try {
             final ObjectMapper mapper = new ObjectMapper();
             JsonNode json = mapper.readTree(jsonParameterObject);
@@ -201,13 +207,14 @@ public class InputValidator {
      * - image/tif
      * - image/tiff
      *
-     * Valid proprietary files have to have one of these extension:
+     * Valid proprietary files have to have the filetype "application/octet-stream" and one of these extension:
      * - czi
      *
      * If the file is not valid, the isValid variable gets false and an error message will be stored.
      * @param file
      */
     public void addFile(MultipartFile file){
+        logger.debug("Try to validate the file");
         // Check if file is supported
         if(!checkFile(file)){
             addNewError(new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
@@ -222,6 +229,7 @@ public class InputValidator {
     private boolean checkFile(MultipartFile file){
         // Check if standardFile
         if(FileTypeChecker.isSupportedStandardFile(file)){
+            logger.debug("File is valid standard Filetype");
             return true;
         }
         // Check if allowed proprietary file
@@ -233,7 +241,10 @@ public class InputValidator {
                         HttpStatus.UNSUPPORTED_MEDIA_TYPE));
             }
             return true;
+        } else {
+            logger.debug("Filetype is not a valid Filetyp for proprietary files. (Valid is e.g. \"application/octet-stream\")");
         }
+        logger.debug("File is invalid");
         return false;
     }
 
@@ -249,7 +260,7 @@ public class InputValidator {
      * @return The ResponseEntity contains a error message and a html (error) status.
      */
     public Optional<ResponseEntity<String>> getLastErrorResponse(){
-        return Optional.ofNullable(lastHtmlErrorResponse);
+        return Optional.ofNullable(lastHtmlErrorResponse); //todo perhaps better to get the first?
     }
 
     /**
