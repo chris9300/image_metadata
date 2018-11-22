@@ -40,7 +40,7 @@ public class InputValidator {
     }
 
     public InputValidator() {
-        logger = LoggerFactory.getLogger(ImageMetadataController.class);
+        logger = LoggerFactory.getLogger(InputValidator.class);
         factory = Validation.buildDefaultValidatorFactory();
         htmlErrorResponseList = new ArrayList<ResponseEntity<String>>();
     }
@@ -128,11 +128,11 @@ public class InputValidator {
         try {
             JsonNode json = mapper.readTree(jsonKeyArr);
             if(!json.isArray()){
-                logger.warn(jsonKeyArr + " could not interpreded as json Array for the key Array");
+                logger.debug(jsonKeyArr + " could not interpreded as json Array for the key Array");
                 addNewError(new ResponseEntity<String>("The json \"keys\" array is corrupted (no json array detected)", HttpStatus.UNPROCESSABLE_ENTITY));
             }
         } catch (IOException e) {
-            logger.warn(jsonKeyArr + " could not interpreded as json Array for the key Array");
+            logger.debug(jsonKeyArr + " could not interpreded as json Array for the key Array");
             addNewError(new ResponseEntity<String>("The json \"keys\" array is corrupted (no valid json detected)", HttpStatus.UNPROCESSABLE_ENTITY));
         }
 
