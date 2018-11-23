@@ -9,6 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.rspace.rspaceimgmetadata.microservice.repository.ImageMetadataJsonSearchRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,11 @@ public class ImageMetadataSearchService {
     @Autowired
     ImageMetadataJsonSearchRepository searchRepository;
 
+    Logger logger;
+
+    public ImageMetadataSearchService() {
+        logger = LoggerFactory.getLogger(ImageMetadataSearchService.class);
+    }
 
     /**
      * Searches for images that have metadata which matches with the searchTerm.
@@ -154,6 +161,7 @@ public class ImageMetadataSearchService {
             jsonKeyArray = mapper.writeValueAsString(topLvlKeys);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+            logger.debug("Cannot create the json String from the top lvl keys (database return). \nDB Return List: " + topLvlKeys.toString() + " \n" + e.getMessage()+ "\n" + e.getStackTrace());
         }
 
         return jsonKeyArray;
@@ -179,6 +187,8 @@ public class ImageMetadataSearchService {
             jsonKeyPathArray = objectMapper.writeValueAsString(keyPathList);
         } catch (JsonProcessingException e) {
             e.printStackTrace(); // should never happen
+            logger.debug("Cannot create the json String from the top keyPath List (database return). \nDB Return List: " + keyPathList.toString() + " \n" + e.getMessage()+ "\n" + e.getStackTrace());
+
         }
 
         return jsonKeyPathArray;
@@ -202,15 +212,11 @@ public class ImageMetadataSearchService {
             objectMapper.writeValue(stringWriter, jsonResultList);
             return stringWriter.toString();
 
-        } catch (JsonGenerationException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
+            logger.debug("Cannot create the json String from the database return. \nDB Return List: " + jsonResultList.toString() + " \n" + e.getMessage()+ "\n" + e.getStackTrace());
             e.printStackTrace();
-        }
 
-        // todo exception handling
+        }
         return "";
     }
 
@@ -225,18 +231,17 @@ public class ImageMetadataSearchService {
         ObjectMapper mapper = new ObjectMapper();
         String jsonPathArray = "";
 
+        ArrayList<String> keyList = new ArrayList<String>();
+
         try {
             JsonNode jsonKeys = mapper.readTree(jsonKeyString);
-
-            ArrayList<String> keyList = new ArrayList<String>();
             jsonKeys.forEach((JsonNode node) -> keyList.add("$." + node.asText()));
 
             jsonPathArray = mapper.writeValueAsString(keyList);
 
-
         } catch (IOException e) {
             e.printStackTrace();
-            //todo: Handle json Errors
+            logger.debug("Cannot create the jsonArray key Array from the list. \nDB List: " + keyList.toString() + " \n" + e.getMessage()+ "\n" + e.getStackTrace());
         }
 
         return jsonPathArray;
@@ -244,7 +249,7 @@ public class ImageMetadataSearchService {
 
 
     /**
-     * Extracts the value for the key String and returns the result as String
+     * Extracts the value for the key and returns the result as String
      * @param key
      * @param jsonParameter
      * @return
@@ -257,8 +262,7 @@ public class ImageMetadataSearchService {
             json = mapper.readTree(jsonParameter);
         } catch (IOException e) {
             e.printStackTrace();
-            //todo exception handling  --> create wrongJsonParameterException?
-        }
+            logger.debug("Cannot extract an value for the key " + key + " in " + jsonParameter + " \n" + e.getMessage()+ "\n" + e.getStackTrace()); }
 
         JsonNode selectedElement = json.findPath(key);
 

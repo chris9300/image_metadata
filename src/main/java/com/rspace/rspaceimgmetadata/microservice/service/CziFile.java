@@ -1,6 +1,8 @@
 package com.rspace.rspaceimgmetadata.microservice.service;
 
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.NoValidCziFileException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -11,6 +13,11 @@ public class CziFile {
     final static String SEGMENT_ID_METADATA = "ZISRAWMETADATA";
 
     byte[] fileBytes;
+    Logger logger;
+
+    public CziFile() {
+        logger = LoggerFactory.getLogger(CziFile.class);
+    }
 
     /**
      * Creates a new CziFile from an inputStream
@@ -18,6 +25,7 @@ public class CziFile {
      * @throws NoValidCziFileException
      */
     public CziFile(InputStream inputStream) throws NoValidCziFileException {
+        this();
         readInputStream(inputStream);
     }
 
@@ -27,6 +35,7 @@ public class CziFile {
      * @throws NoValidCziFileException
      */
     public CziFile(MultipartFile file) throws NoValidCziFileException {
+        this();
         readMultipartFile(file);
     }
 
@@ -36,6 +45,7 @@ public class CziFile {
      * @throws NoValidCziFileException
      */
     public CziFile(String filename) throws NoValidCziFileException, FileNotFoundException {
+        this();
         File file = new File(filename);
         readFile(file);
     }
@@ -46,6 +56,7 @@ public class CziFile {
      * @throws NoValidCziFileException
      */
     public CziFile(File file) throws NoValidCziFileException, FileNotFoundException {
+        this();
         readFile(file);
     }
 
@@ -73,7 +84,7 @@ public class CziFile {
             }
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug("Could not read the czi input file. " + e.getMessage()+ "\n" + e.getStackTrace());
             throw new NoValidCziFileException("Could not read the input File. Perhaps the file is corrupted.", e);
         }
     }
@@ -96,7 +107,7 @@ public class CziFile {
             InputStream inputStream = file.getInputStream();
             readInputStream(inputStream);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug("Could not read the czi input file. " + e.getMessage() + "\n" + e.getStackTrace());
             throw new NoValidCziFileException("Could not read the input File. Perhaps the file is corrupted.", e);
         }
     }
@@ -110,7 +121,7 @@ public class CziFile {
         try {
             segmentID = new String(Arrays.copyOfRange(fileBytes, 0, 15), "utf-8");
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.debug("Could not encode the czi input file. " + e.getMessage() + "\n" + e.getStackTrace());
             return false;
         }
 
