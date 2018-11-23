@@ -71,7 +71,7 @@ public class InputValidator {
         // handle errors
         if (constraintViolations.size() > 0) {
             for (ConstraintViolation<ImageMetadataEntity> violation : constraintViolations) {
-                logger.debug("Found non-valid url-path value for " + violation.getPropertyPath() + ": " + violation.getMessage());
+                logger.warn("Found non-valid url-path value for " + violation.getPropertyPath() + ": " + violation.getMessage());
                 ResponseEntity<String> error = new ResponseEntity<String>(
                         "The url path variable " + violation.getPropertyPath() + " is invalid: " + violation.getMessage(),
                         HttpStatus.BAD_REQUEST);
@@ -98,6 +98,7 @@ public class InputValidator {
         // handle errors
         if (constraintViolations.size() > 0) {
             for (ConstraintViolation<ImageMetadataEmbeddedKey> violation : constraintViolations) {
+                logger.warn("Found non-valid url-path value for " + violation.getPropertyPath() + ": " + violation.getMessage());
                 ResponseEntity<String> error = new ResponseEntity<String>(
                         "The url path variable " + violation.getPropertyPath() + " is invalid: " + violation.getMessage(),
                         HttpStatus.BAD_REQUEST);
@@ -132,11 +133,11 @@ public class InputValidator {
         try {
             JsonNode json = mapper.readTree(jsonKeyArr);
             if(!json.isArray()){
-                logger.debug(jsonKeyArr + " could not interpreded as json Array for the key Array");
+                logger.warn("Cannot validate json Key Array: " + jsonKeyArr + " could not interpreted as json Array for the key Array");
                 addNewError(new ResponseEntity<String>("The json \"keys\" array is corrupted (no json array detected)", HttpStatus.UNPROCESSABLE_ENTITY));
             }
         } catch (IOException e) {
-            logger.debug(jsonKeyArr + " could not interpreded as json Array for the key Array");
+            logger.warn("Cannot validate json Key Array: " + jsonKeyArr + " could not interpreted as json Array for the key Array");
             addNewError(new ResponseEntity<String>("The json \"keys\" array is corrupted (no valid json detected)", HttpStatus.UNPROCESSABLE_ENTITY));
         }
 
@@ -156,11 +157,11 @@ public class InputValidator {
         try {
             JsonNode json = mapper.readTree(jsonUserIdArr);
             if(!json.isArray()){
-                logger.warn(jsonUserIdArr + " could not interpreded as json Array for the user Array");
+                logger.warn("Cannot validate json User Array: " + jsonUserIdArr + " could not interpreted as json Array for the user Array");
                 addNewError(new ResponseEntity<String>("The json \"users\" array is corrupted (no json array detected)", HttpStatus.UNPROCESSABLE_ENTITY));
             }
         } catch (IOException e) {
-            logger.warn(jsonUserIdArr + " could not interpreded as json Array for the user Array");
+            logger.warn("Cannot validate json User Array: " + jsonUserIdArr + " could not interpreted as json Array for the user Array");
             addNewError(new ResponseEntity<String>("The json \"users\" array is corrupted (no valid json detected)", HttpStatus.UNPROCESSABLE_ENTITY));
         }
     }
@@ -183,6 +184,7 @@ public class InputValidator {
             if(json.has("keys")) {
                 this.addJsonKeyArr(json.findPath("keys").toString());
             } else {
+                logger.warn("Cannot validate json parameter object: No key array is found in " + jsonParameterObject);
                 addNewError( new ResponseEntity<String>("No \"keys\" field was found in the json Parameter array", HttpStatus.UNPROCESSABLE_ENTITY));
             }
 
@@ -190,10 +192,12 @@ public class InputValidator {
             if(json.has("users")) {
                 this.addJsonKeyArr(json.findPath("users").toString());
             } else {
+                logger.warn("Cannot validate json parameter object: No user array is found in " + jsonParameterObject);
                 addNewError(new ResponseEntity<String>("No \"users\" field was found in the json Parameter array", HttpStatus.UNPROCESSABLE_ENTITY));
             }
 
         } catch (IOException e) {
+            logger.warn("Cannot validate json parameter object: Cannot load " + jsonParameterObject + " as json object");
             addNewError(new ResponseEntity<String>("The json object is corrupted", HttpStatus.UNPROCESSABLE_ENTITY));
         }
     }
@@ -217,6 +221,7 @@ public class InputValidator {
         logger.debug("Try to validate the file");
         // Check if file is supported
         if(!checkFile(file)){
+            logger.warn("Cannot validate the uploaded file.");
             addNewError(new ResponseEntity<String>("No file or wrong file format detected", HttpStatus.UNSUPPORTED_MEDIA_TYPE));
         }
     }
@@ -236,13 +241,14 @@ public class InputValidator {
         if(FileTypeChecker.isSupportedProprietaryFile(file)){
             if(file.getSize() > Integer.MAX_VALUE){
                 // Check that the file size is not bigger than about 250 bytes. This is because the max size of byte arrays
+                logger.warn("Cannot validate the uploaded file: The file is to large for the service. CZI Files are supported to a max of " + Integer.MAX_VALUE + " bytes");
                 addNewError(new ResponseEntity<String>(
                         "The file is to large for the service. CZI Files are supported to a max of " + Integer.MAX_VALUE + " bytes",
                         HttpStatus.UNSUPPORTED_MEDIA_TYPE));
             }
             return true;
         } else {
-            logger.debug("Filetype is not a valid Filetyp for proprietary files. (Valid is e.g. \"application/octet-stream\")");
+            logger.warn("Cannot validate the uploaded File: Filetype is not a valid Filetyp for proprietary files. (Valid is e.g. \"application/octet-stream\")");
         }
         logger.debug("File is invalid");
         return false;
