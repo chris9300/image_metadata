@@ -275,18 +275,4 @@ public class ImgMetaDataAcceptanceTest {
 
 		return response.getStatusCode();
 	}
-
-
-
-	/*
-	Todo Testcases:
-
-	ComponentTests:
-	Convert Metadata to hash map
-	Convert Metadata to json
-	Creating (Parameter) Key lists
-	Extracting of Parameters
-
-	 */
-
 }
