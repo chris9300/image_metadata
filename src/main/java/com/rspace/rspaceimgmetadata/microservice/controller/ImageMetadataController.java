@@ -52,7 +52,7 @@ public class ImageMetadataController {
         InputValidator validator = new InputValidator(inputData);
         validator.addFile(imgFile);
         if(!validator.isValid()){
-            logger.info("Invalid input Variables of Html-Request");
+            logger.info("Validation failed");
             return validator.getLastErrorResponse().get();
         }
         try {
@@ -82,6 +82,7 @@ public class ImageMetadataController {
         InputValidator validator = new InputValidator(inputData);
         validator.addFile(imgFile);
         if(!validator.isValid()){
+            logger.info("Validation failed");
             return validator.getLastErrorResponse().get();
         }
 
@@ -110,6 +111,7 @@ public class ImageMetadataController {
 
         InputValidator validator = new InputValidator(imageKey);
         if(!validator.isValid()){
+            logger.info("Validation failed");
             return validator.getLastErrorResponse().get();
         }
 
@@ -134,6 +136,7 @@ public class ImageMetadataController {
 
         InputValidator validator = new InputValidator(imageKey);
         if(!validator.isValid()){
+            logger.info("Validation failed");
             return validator.getLastErrorResponse().get();
         }
 
@@ -141,6 +144,7 @@ public class ImageMetadataController {
             imageMetadataService.deleteImageMetadata(imageKey);
             return new ResponseEntity<String>("Deleted", HttpStatus.OK);
         } catch (NoDatabaseEntryFoundException e) {
+            logger.info("Could not found images (for deletion");
             return new ResponseEntity<String>("Could not delete!", HttpStatus.NOT_FOUND);
         }
     }

@@ -8,6 +8,8 @@ import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CouldNotParseCZ
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CouldNotParseStdMetadataException;
 import org.apache.commons.imaging.common.IImageMetadata;
 import org.apache.commons.imaging.common.ImageMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -23,6 +25,12 @@ public class ImageMetadataParser {
 
     private HashMap<String, Object> metadataMap;
 
+    Logger logger;
+
+    public ImageMetadataParser() {
+        logger = LoggerFactory.getLogger(ImageMetadataParser.class);
+    }
+
     /**
      * Parses a ImageMetadata object to a json String.
      * @param imgMetadata
@@ -31,7 +39,6 @@ public class ImageMetadataParser {
     public static String parseToJson(IImageMetadata imgMetadata) throws CouldNotParseStdMetadataException {
         ImageMetadataParser parser = new ImageMetadataParser();
         final String json =  parser.toJson(imgMetadata);
-
         return json;
     }
 
@@ -47,6 +54,7 @@ public class ImageMetadataParser {
     public HashMap<String, Object> toHashmap(IImageMetadata imgMetadata){
         metadataMap = new HashMap<>();
         if(imgMetadata == null){
+            logger.warn("No Metadata found. Returned empty set111111111111");
             return metadataMap;
         }
 

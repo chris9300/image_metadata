@@ -25,6 +25,7 @@ public class ImageMetadataSearchController {
 
     @GetMapping("/img_metadata/search/{searchTerm}")
     public ResponseEntity<String> searchInAll(@PathVariable String searchTerm){
+        logger.info("Received search (full term) request");
         String jsonStrResult = searchService.searchTermInAll(searchTerm);
         return createJsonResponseEntity(jsonStrResult);
     }
@@ -38,6 +39,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/inKeys/{searchTerm}")
     public ResponseEntity<String> searchInKeysOfAllUsers(@PathVariable String searchTerm, @RequestBody String jsonKeys){
+        logger.info("Received search (full term) in selected Keys request with the following json parameter: " + jsonKeys);
 
         // Validate json Input
         InputValidator validator = new InputValidator();
@@ -60,6 +62,8 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/ofUsers/{searchTerm}")
     public ResponseEntity<String> searchInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
+        logger.info("Received search (full term) in selected users request with the following json parameter: " + jsonUsers);
+
         // Validate json Input
         InputValidator validator = new InputValidator();
         validator.addJsonUserIdArr(jsonUsers);
@@ -84,6 +88,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/inKeys/ofUsers/{searchTerm}")
     public ResponseEntity<String> searchInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
+        logger.info("Received search (full term) in selected Keys of selected users request with the following json parameter: " + jsonParameter);
         // Validate json Input
         InputValidator validator = new InputValidator();
         validator.addJsonParameterObject(jsonParameter);
@@ -104,6 +109,7 @@ public class ImageMetadataSearchController {
      */
     @GetMapping("/img_metadata/search/prefix/{searchPrefix}")
     public ResponseEntity<String> searchPrefixInAll(@PathVariable String searchPrefix){
+        logger.info("Received search (prefix) request");
         String jsonStrResult = searchService.searchPrefixInAll(searchPrefix);
         return createJsonResponseEntity(jsonStrResult);
     }
@@ -117,6 +123,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/prefix/inKeys/{searchTerm}")
     public ResponseEntity<String> searchPrefixInKeysOfAllUsers(@PathVariable String searchTerm, @RequestBody String jsonKeys){
+        logger.info("Received search (prefix) in selected Keys request with the following json parameter: " + jsonKeys);
         // Validate json Input
         InputValidator validator = new InputValidator();
         validator.addJsonKeyArr(jsonKeys);
@@ -138,6 +145,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/prefix/ofUsers/{searchTerm}")
     public ResponseEntity<String> searchPrefixInAllKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonUsers){
+        logger.info("Received search (prefix) in selected users request with the following json parameter: " + jsonUsers);
         // Validate json Input
         InputValidator validator = new InputValidator();
         validator.addJsonUserIdArr(jsonUsers);
@@ -163,7 +171,7 @@ public class ImageMetadataSearchController {
      */
     @PostMapping("/img_metadata/search/prefix/inKeys/ofUsers/{searchTerm}")
     public ResponseEntity<String> searchPrefixInKeysOfUsers(@PathVariable String searchTerm, @RequestBody String jsonParameter){
-        logger.debug("Received search for Prefix in Users request with the following parameter: " + jsonParameter);
+        logger.info("Received search (prefix) in selected Keys of selected users request with the following json parameter: " + jsonParameter);
         // Validate json Input
         InputValidator validator = new InputValidator();
         validator.addJsonParameterObject(jsonParameter);
