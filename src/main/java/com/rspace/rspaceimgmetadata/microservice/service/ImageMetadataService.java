@@ -10,6 +10,8 @@ import com.rspace.rspaceimgmetadata.microservice.util.excpetions.*;
 import org.apache.commons.imaging.ImageReadException;
 import org.apache.commons.imaging.Imaging;
 import org.apache.commons.imaging.common.IImageMetadata;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,11 @@ public class ImageMetadataService {
     @Autowired
     ImageMetadataRepository metadataRepository;
 
+    Logger logger;
+
+    public ImageMetadataService() {
+        logger = LoggerFactory.getLogger(ImageMetadataService.class);
+    }
 
     /**
      * Returns an json object for one image containing the custId, rspaceImageId, version, userId and all metadata
@@ -105,6 +112,7 @@ public class ImageMetadataService {
         try {
             metadataRepository.deleteById(imageKey);
         } catch (EmptyResultDataAccessException e){
+            logger.debug("Key: " + imageKey.toString() + "was not found in the database");
             throw new NoDatabaseEntryFoundException("No Object with that key was found in the database", null);
         }
     }
@@ -125,6 +133,7 @@ public class ImageMetadataService {
                 return jsonMetadata;
             } catch (ImageReadException | IOException e) {
                 e.printStackTrace();
+                logger.warn("Could not extract the metadata from the uploaded Image file");
                 // This should only thrown if the data is from the wrong file format
                 throw new WrongOrCorruptFileException("Could not extract the metadata. Probably the file is corrupted or perhaps the file has the wrong file format", e);
             }

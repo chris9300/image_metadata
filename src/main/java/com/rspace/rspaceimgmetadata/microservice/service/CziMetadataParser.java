@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CouldNotParseCZIMetadataException;
 import com.rspace.rspaceimgmetadata.microservice.util.excpetions.CziMetadataSegmentNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,8 +34,11 @@ public class CziMetadataParser {
     private String xmlMetadata;
     private String jsonMetadata;
 
+    Logger logger;
+
 
     public CziMetadataParser(CziFile cziFile) {
+        logger = LoggerFactory.getLogger(CziMetadataParser.class);
         this.cziFile = cziFile;
     }
 
@@ -89,7 +94,7 @@ public class CziMetadataParser {
             jsonMetadata = jsonMapper.writeValueAsString(json);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.debug("Cannot convert the xml metadata to json. \nXML:\n" + xmlMetadata + "\n" + e.getMessage()+ "\n" + e.getStackTrace());
             throw new CouldNotParseCZIMetadataException("An error ocurred by parsing the extracted xml to json. Perhaps the extracted xml is not valid", e);
         }
     }
@@ -123,6 +128,7 @@ public class CziMetadataParser {
 
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            logger.debug("Cannot extract the Xml Metadata from the CziFile (Object) \n" + e.getMessage()+ "\n" + e.getStackTrace());
         }
 
     }
@@ -138,6 +144,7 @@ public class CziMetadataParser {
             segmentID = new String(Arrays.copyOfRange(cziFile.getFileBytes(), (int) metadataPosition, (int) metadataPosition + 15), "utf-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            logger.debug("Cannot extract the Position of the Metadata in the CziFile (Object) \n" + e.getMessage()+ "\n" + e.getStackTrace());
             return false;
         }
         return segmentID.contains(SEGMENT_ID_METADATA);
@@ -168,6 +175,8 @@ public class CziMetadataParser {
             return lowerParser();
         } catch (IOException e) {
             e.printStackTrace();
+            logger.debug("Cannot parse the json Metadata keys to lower case keys \n" + e.getMessage()+ "\n" + e.getStackTrace());
+
             throw new CouldNotParseCZIMetadataException("Could not parse the normal json String to json String with lower cases", e);
         }
     }

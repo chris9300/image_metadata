@@ -121,10 +121,10 @@ public class ImageMetadataParser {
 
         } catch (IOException e) {
             e.printStackTrace();
+            logger.debug("Cannot parse the extracted metadata (hashmap) to json \n" + e.getMessage()+ "\n" + e.getStackTrace());
             throw new CouldNotParseStdMetadataException("An error occured by parsing the metadata hashmap to the json string", e);
         }
 
-        // todo exception handling
         return stringWriter.toString();
     }
 }
