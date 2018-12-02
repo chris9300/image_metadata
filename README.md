@@ -144,7 +144,7 @@ In both searches can include wildcards. These two Wildcards are allowed:
     
     Consider that keys have to match exactly. It is not possible to search directly for a lower level key. In this case you need to use the complete key path.
     
-Search in all datasets:
+**Search in all datasets:**
 
 Request:
 
@@ -162,7 +162,7 @@ Response:
     Errors:
         Searchpath Arg cannot be parsed to String: BAD_REQUEST (400) 
 
-Search in certain keys:
+*vSearch in certain keys:**
 
 Request:
 
@@ -181,7 +181,7 @@ Response:
         - Searchpath Arg cannot be parsed to String: BAD_REQUEST (400) 
         - Invalid Json Keys Array: UNPROCESSABLE_ENTITY (422)
         
-Search in datasets of certain users:
+**Search in datasets of certain users:**
 
 Request:
 
@@ -200,7 +200,7 @@ Response:
         - Searchpath Arg cannot be parsed to String: BAD_REQUEST (400) 
         - Invalid Json Users Array: UNPROCESSABLE_ENTITY (422)
 
-Search in certain keys of datasets of certain users
+**Search in certain keys of datasets of certain users:**
 
 Request:
 
