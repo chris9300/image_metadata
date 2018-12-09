@@ -13,7 +13,9 @@ In the application.properties files are the database and server configs. Ensure 
 
 **Database**
 
-You have to create the database on your MySql server previously (for productive as well as for test cases). You don't need to create any tables in the database. 
+You have to create the database on your MySql server previously (for productive as well as for test cases). You don't need to create any tables in the database.
+
+The Mysql version has to be 8.0 or higher! 
 
 ###Run
 
@@ -53,7 +55,7 @@ Request:
     Http-Type: PUT
     Request Body: Form-data, image File (as MultipartFile)
    
-        curl /img_metadata/insert/{customerId}/{userId}/{rspaceImageId}/{version} TODO 
+        curl -F "file=@{local_filename}" /img_metadata/insert/{customerId}/{userId}/{rspaceImageId}/{version} 
    
 Response:
     
@@ -72,7 +74,7 @@ Request:
     Http-Type: POST
     Request Body: Form-data, image File (as MultipartFile)
    
-        curl server/img_metadata/update/{customer_id}/{user_id}/{rspaceImage_id}/{version_no} TODO 
+        curl -F "file=@{local_filename}" server/img_metadata/update/{customer_id}/{user_id}/{rspaceImage_id}/{version_no} 
    
 Response:
     
@@ -107,7 +109,7 @@ Request:
     Http-Type: DELETE
     Request Body: -
    
-        curl server/img_metadata/delete/{customer_id}/{image_id}/{version_no} TODO
+        curl -X DELETE server/img_metadata/delete/{customer_id}/{image_id}/{version_no}
    
 Response:
     
@@ -119,11 +121,16 @@ Response:
 
 **Get Keys**
     
-TODO
-Which errors are possible? Which are the correct responses?
+Requst:
+
+    Https-Type: GET
+    Request Body: -
+    
+        curl server/img_metadata/topKeys
+        curl server/img_metadata/allKeys
 
 
-**Search functions**
+####**Search functions**
 
 The Search functions are separated into two parts:
 
@@ -162,15 +169,15 @@ Response:
     Errors:
         Searchpath Arg cannot be parsed to String: BAD_REQUEST (400) 
 
-*vSearch in certain keys:**
+**Search in certain keys:**
 
 Request:
 
     Http-Type: POST
     Request Body: Json array: ["key1", "key2", … ]
    
-        curl server/img_metadata/search/inKeys/{searchTerm} TODO 
-        curl server/img_metadata/search/prefix/inKeys/{SearchPrefix} TODO
+        curl -H "Content-Type: application/json" -d '{body}' server/img_metadata/search/inKeys/{searchTerm} TODO 
+        curl -H "Content-Type: application/json" -d '{body}' server/img_metadata/search/prefix/inKeys/{SearchPrefix} TODO
    
 Response:
     
@@ -188,8 +195,8 @@ Request:
     Http-Type: POST
     Request Body: Json array: ["user_id1", "user_id2", … ]
    
-        curl server/img_metadata/search/ofUsers/{searchTerm} TODO 
-        curl server/img_metadata/search/prefix/ofUsers/{SearchPrefix} TODO
+        curl -H "Content-Type: application/json" -d '{body}' server/img_metadata/search/ofUsers/{searchTerm}
+        curl -H "Content-Type: application/json" -d '{body}' server/img_metadata/search/prefix/ofUsers/{SearchPrefix}
    
 Response:
     
@@ -207,8 +214,8 @@ Request:
     Http-Type: POST
     Request Body: Json Object: {"keys":["key1", "key2", … ], "users":["user_id1", "user_id2", … ]}
    
-        curl server/img_metadata/search/inKeys/ofUsers/{searchTerm} TODO 
-        curl server/img_metadata/search/prefix/inKeys/ofUsers/{SearchPrefix} TODO
+        curl -H "Content-Type: application/json" -d '{body}' server/img_metadata/search/inKeys/ofUsers/{searchTerm}
+        curl -H "Content-Type: application/json" -d '{body}' server/img_metadata/search/prefix/inKeys/ofUsers/{SearchPrefix}
    
 Response:
     
