@@ -144,7 +144,7 @@ public class ImageMetadataController {
             imageMetadataService.deleteImageMetadata(imageKey);
             return new ResponseEntity<String>("Deleted", HttpStatus.OK);
         } catch (NoDatabaseEntryFoundException e) {
-            logger.info("Could not found images (for deletion");
+            logger.info("Could not found images (for deletion)");
             return new ResponseEntity<String>("Could not delete!", HttpStatus.NOT_FOUND);
         }
     }
@@ -154,7 +154,7 @@ public class ImageMetadataController {
      * A quick method to assert service is up and running
      * @return
      */
-    @GetMapping
+    @GetMapping("/status")
     private ResponseEntity<String> status() {
     	return new ResponseEntity<String>("Service is running", HttpStatus.OK);
     }
